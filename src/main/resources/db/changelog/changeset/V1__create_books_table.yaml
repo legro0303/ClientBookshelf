@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_books_table #текстовый идентификатор (Обязателен)
+      author: SSenchenko # автор (Обязателен)
+      changes:
+        - createTable: # создаем новую таблицу
+            tableName: books
+            columns: # объявления колонок
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: books_pk
+                    nullable: false
+              - column:
+                  name: author
+                  type: character varying(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: character varying(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: publish_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: book
+                  type: bytea
+                  constraints:
+                    nullable: false

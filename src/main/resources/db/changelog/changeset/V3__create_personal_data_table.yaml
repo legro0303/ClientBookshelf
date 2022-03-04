@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_personal_data_table #текстовый идентификатор (Обязателен)
+      author: SSenchenko # автор (Обязателен)
+      changes:
+        - createTable: # создаем новую таблицу
+            tableName: personal_data
+            columns: # объявления колонок
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: personal_data_pk
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: character varying(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: second_name
+                  type: character varying(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: login
+                  type: character varying(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: mail
+                  type: character varying(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: character varying(30)
+                  constraints:
+                    nullable: false

@@ -1,0 +1,16 @@
+.button {
+	-fx-background-color:#FFDE59;
+	-fx-border-color:black;
+}
+.button .text {
+	-fx-effect: dropshadow( two-pass-box , rgba(50,50,50,1) ,  1.70, 1 , 1.5 , 1 );
+}
+.text-field {
+	-fx-border-color:black;
+	-fx-background-color:#323440;
+}
+.text-input {
+	-fx-text-fill: #ababab;
+}
+
+

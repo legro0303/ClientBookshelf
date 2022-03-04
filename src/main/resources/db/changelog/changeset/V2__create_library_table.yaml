@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_library_table #текстовый идентификатор (Обязателен)
+      author: SSenchenko # автор (Обязателен)
+      changes:
+        - createTable: # создаем новую таблицу
+            tableName: library
+            columns: # объявления колонок
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: library_pk
+                    nullable: false
+              - column:
+                  name: author
+                  type: character varying(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: character varying(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: publish_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: login
+                  type: character varying(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_data
+                  type: int(8)
+                  constraints:
+                    nullable: false

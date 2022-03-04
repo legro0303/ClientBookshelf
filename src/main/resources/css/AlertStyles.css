@@ -1,0 +1,22 @@
+.AlertStyles{
+    -fx-background-color: rgb(33,33,43);
+}
+.AlertStyles > *.label.content{
+    -fx-font-size: 20px;
+    -fx-text-fill:#ababab;
+    -fx-font-family: "Web Serveroff";
+}
+.button {
+	-fx-background-color:#FFDE59;
+	-fx-border-color:black;
+}
+.button .text {
+	-fx-fill:white;
+	-fx-effect: dropshadow( two-pass-box , rgba(50,50,50,1) ,  1.70, 1 , 1.5 , 1 );
+}
+.text-field {
+	-fx-border-color:black;
+	-fx-background-color:#323440;
+}
+
+

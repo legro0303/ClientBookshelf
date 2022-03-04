@@ -1,0 +1,7 @@
+databaseChangeLog: #параметр в котором находятся миграции
+  - include: # список активных миграций
+      file: db/changelog/changeset/V1__create_books_table.yaml # путь к файлу миграции
+  - include:
+      file: db/changelog/changeset/V2__create_library_table.yaml
+  - include:
+      file: db/changelog/changeset/V3__create_personal_data_table.yaml
