@@ -18,12 +18,10 @@
 
         <spring.boot.version>2.6.1</spring.boot.version>
         <thymeleaf-spring5.version>3.1.0.M1</thymeleaf-spring5.version>
-        <liquibase.version>4.7.1</liquibase.version>
         <lombok.version>1.18.22</lombok.version>
         <javafx.version>15.0.1</javafx.version>
         <springdoc.swagger.version>1.5.13</springdoc.swagger.version>
         <unirest.version>1.4.9</unirest.version>
-        <postgresql.version>42.2.14</postgresql.version>
         <jackson.version>2.13.0</jackson.version>
         <spring.test.version>5.3.16</spring.test.version>
 
@@ -89,12 +87,6 @@
             <artifactId>spring-boot-starter-log4j2</artifactId>
             <version>${spring.boot.version}</version>
         </dependency>
-        <!-- liquibase -->
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>${liquibase.version}</version>
-        </dependency>
         <!-- lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -133,7 +125,6 @@
             <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-
         <!--Swagger-->
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -151,12 +142,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.test.version}</version>
-        </dependency>
-        <!-- DB Postgres-->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
         </dependency>
         <!-- jackson-->
         <dependency>

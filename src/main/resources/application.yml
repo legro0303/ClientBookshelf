@@ -1,20 +1,4 @@
-server:
+client:
   port: ${app.port}
   forward-headers-strategy: framework
-
-spring:
-  datasource:
-    driverClassName: org.postgresql.Driver
-    url: ${db.url}
-    username: ${db.username}
-    password: ${db.password}
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: none
-    show-sql: ${jpa.show-sql}
-  liquibase:
-    enabled: true
 
