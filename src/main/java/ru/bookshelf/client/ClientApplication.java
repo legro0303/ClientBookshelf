@@ -7,14 +7,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.io.IOException;
 
-@OpenAPIDefinition(info = @Info(title = "Sbis service API", version = "1.0", description = "Sbis service Information"))
-@SpringBootApplication
+@OpenAPIDefinition(info = @Info(title = "Bookshelf service API", version = "1.0", description = "Bookshelf service Information"))
 @EnableJpaRepositories
 /** JavaFX App */
 public class ClientApplication extends Application {
