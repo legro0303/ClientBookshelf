@@ -183,9 +183,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>ru.bookshelf.client.StartJavaFX</mainClass>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -271,6 +268,9 @@
                             <goals>
                                 <goal>repackage</goal>
                             </goals>
+                            <configuration>
+                                <mainClass>ru.bookshelf.client.StartJavaFX</mainClass>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
