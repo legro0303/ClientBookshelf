@@ -15,12 +15,8 @@ public class StartController {
 
   @FXML private Button startButton;
 
-  FXMLLoader loader = new FXMLLoader();
-  Stage stage = new Stage();
-
   @FXML
   void initialize() {
-
     startButton.setOnAction(
         actionEvent -> {
           HttpResponse<String> req = null;
@@ -28,9 +24,11 @@ public class StartController {
             req = Unirest.get("http://localhost:8080/message").asString();
           } catch (UnirestException e) {
               AlertService alertService = new AlertService();
-              alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "В данный момент сервер не функционирует");
+              alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "В данный момент сервер не функционирует", false);
             e.printStackTrace();
           }
+            FXMLLoader loader = new FXMLLoader();
+            Stage stage = new Stage();
             LoadSceneService loadSceneService = new LoadSceneService();
             loadSceneService.setScene(loader, startButton, "/FXML/authorization.fxml",
                     stage, "Авторизация");

@@ -10,8 +10,8 @@ import lombok.*;
 @ToString
 @Builder(toBuilder = true)
 public class ValidationResultDTO {
-  public Boolean validationLogin;
-  public Boolean authorization;
-  public Boolean bookSaving;
+  public Boolean loginValidated;
+  public Boolean userAuthorized;
+  public Boolean bookSaved;
   public long booksCount;
 }

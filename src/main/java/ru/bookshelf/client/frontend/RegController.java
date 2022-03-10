@@ -11,8 +11,9 @@ import ru.bookshelf.client.domain.entity.Person;
 import ru.bookshelf.client.service.AlertService;
 import ru.bookshelf.client.service.LoadSceneService;
 
-public class RegController {
+import java.util.Optional;
 
+public class RegController {
 
 
     @FXML
@@ -31,13 +32,8 @@ public class RegController {
     private PasswordField passReg;
 
 
-    FXMLLoader loader;
-    Stage stage;
-//    private final LoadSceneService loadSceneService;
-//
-//    public RegController(LoadSceneService loadSceneService) {
-//        this.loadSceneService = loadSceneService;
-//    }
+    FXMLLoader loader = new FXMLLoader();
+    Stage stage = new Stage();
 
     @FXML
     void initialize() {
@@ -56,7 +52,7 @@ public class RegController {
                             || firstNameReg.getText().trim().isEmpty()
                             || mailReg.getText().trim().isEmpty()) {
                         AlertService alertService = new AlertService();
-                        alertService.showAlert(Alert.AlertType.INFORMATION, "Ошибка", "Вы заполнили не все поля");
+                        alertService.showAlert(Alert.AlertType.INFORMATION, "Ошибка", "Вы заполнили не все поля", false);
                     } else {
                         Person person = new Person();
                         person.setFirstName(firstNameReg.getText());
@@ -96,18 +92,17 @@ public class RegController {
                                 e.printStackTrace();
                             }
                             AlertService alertService = new AlertService();
-                            alertService.showAlert(Alert.AlertType.INFORMATION, "Вы зарегистрированы", "Успех! Вы зарегистрированы");
-//                            Optional<ButtonType> result = alert.showAndWait();
-//                            if (result.get() == ButtonType.OK) {
-//                                LoadSceneService loadSceneService = new LoadSceneService();
-//                                loadSceneService.setScene(loader, backToAuthButtonReg, "/FXML/authorization.fxml",
-//                                        stage, "Авторизация");
-//                            }
+                            Optional<ButtonType> result = alertService.showAlert(Alert.AlertType.INFORMATION, "Вы зарегистрированы", "Успех! Вы зарегистрированы", true);
+                            if (result.get() == ButtonType.OK) {
+                                LoadSceneService loadSceneService = new LoadSceneService();
+                                loadSceneService.setScene(loader, backToAuthButtonReg, "/FXML/authorization.fxml",
+                                        stage, "Авторизация");
+                            }
                         } else if (validationLogin == false) {
                             AlertService alertService = new AlertService();
-                            alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Логин, введённый вами уже используются. Пожалуйста, введите другие данные.");
+                            alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Логин, введённый вами уже используются. Пожалуйста, введите другие данные.", false);
                             LoadSceneService loadSceneService = new LoadSceneService();
-                            loadSceneService.clearFields(firstNameReg,secondNameReg,loginReg, passReg, mailReg);
+                            loadSceneService.clearFields(firstNameReg, secondNameReg, loginReg, passReg, mailReg);
                         }
                     }
                 });

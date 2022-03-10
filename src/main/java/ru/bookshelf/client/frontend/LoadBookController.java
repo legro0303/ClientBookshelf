@@ -8,6 +8,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lombok.RequiredArgsConstructor;
 import ru.bookshelf.client.domain.entity.UploadedBook;
 import ru.bookshelf.client.service.AlertService;
 import ru.bookshelf.client.service.LoadSceneService;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+
 
 public class LoadBookController {
 
@@ -59,14 +61,14 @@ public class LoadBookController {
                     if (tbAuthor.getText().trim().isEmpty()
                             || tbTitle.getText().trim().isEmpty()
                             || dpPublish_date.getValue() == null) {
-                        alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Вы заполнили не все поля");
+                        alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Вы заполнили не все поля", false);
                     } else {
 //                        uploadedBook.setLogin(AuthController.user.getLogin());
                         try {
                             file = new FileInputStream(new File(choosedFile.getAbsolutePath()));
                         } catch (FileNotFoundException | NullPointerException e) {
                             alertService.showAlert(Alert.AlertType.ERROR, "Ошибка",
-                                    "Пожалуйста, загрузите книгу прежде чем сохранить её в библиотеку");
+                                    "Пожалуйста, загрузите книгу прежде чем сохранить её в библиотеку", false);
                             e.printStackTrace();
                         }
                         try {

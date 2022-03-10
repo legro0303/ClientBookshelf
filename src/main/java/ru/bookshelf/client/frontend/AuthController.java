@@ -21,6 +21,7 @@ public class AuthController {
     FXMLLoader loader = new FXMLLoader();
     Stage stage = new Stage();
 
+
     @FXML
     void initialize() {
 
@@ -58,7 +59,7 @@ public class AuthController {
                     } else if (userAuthorization == false) {
                         AlertService alertService = new AlertService();
                         alertService.showAlert(Alert.AlertType.ERROR, "Ошибка",
-                                "Вы ввели неверный логин или пароль, пожалуйста, попробуйте ввести данные ещё раз.");
+                                "Вы ввели неверный логин или пароль, пожалуйста, попробуйте ввести данные ещё раз.", false);
                     }
                 });
     }
