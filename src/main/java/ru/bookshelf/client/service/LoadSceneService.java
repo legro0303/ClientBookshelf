@@ -48,11 +48,11 @@ public class LoadSceneService {
         stage.setScene(new Scene(root));
         stage.show();
     }
-    public void clearFields(PasswordField passReg, TextField loginReg, TextField secondNameReg, TextField nameReg, TextField mailReg){
-        passReg.clear();
-        loginReg.clear();
+    public void clearFields(TextField firstNameReg,TextField secondNameReg,TextField loginReg,PasswordField passReg, TextField mailReg){
+        firstNameReg.clear();
         secondNameReg.clear();
-        nameReg.clear();
+        loginReg.clear();
+        passReg.clear();
         mailReg.clear();
     }
 }

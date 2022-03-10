@@ -20,6 +20,7 @@ public class StartController {
 
   @FXML
   void initialize() {
+
     startButton.setOnAction(
         actionEvent -> {
           HttpResponse<String> req = null;

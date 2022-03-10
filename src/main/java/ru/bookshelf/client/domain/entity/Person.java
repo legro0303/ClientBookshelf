@@ -17,6 +17,6 @@ public class Person {
   public String firstName;
   public String secondName;
   public String login;
-  public String mail;
   public String password;
+  public String mail;
 }

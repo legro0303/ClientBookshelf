@@ -16,37 +16,37 @@
             <Image url="@../assets/3.jpg" />
          </image>
       </ImageView>
-      <PasswordField fx:id="passReg" layoutX="217.0" layoutY="412.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
+      <PasswordField fx:id="passReg" layoutX="217.0" layoutY="344.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
       <TextField fx:id="loginReg" layoutX="217.0" layoutY="274.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
       <Button fx:id="buttonReg" layoutX="217.0" layoutY="508.0" mnemonicParsing="false" prefHeight="53.0" prefWidth="285.0" stylesheets="@../css/Styles.css" text="Регистрация" textFill="WHITE">
          <font>
             <Font size="24.0" />
          </font>
       </Button>
-      <Label layoutX="217.0" layoutY="242.0" prefHeight="31.0" prefWidth="49.0" text="Логин" textFill="#ababab">
+      <Label layoutX="217.0" layoutY="244.0" prefHeight="31.0" prefWidth="49.0" text="Логин" textFill="#ababab">
          <font>
             <Font name="Web Serveroff Regular" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="217.0" layoutY="381.0" prefHeight="31.0" prefWidth="70.0" text="Пароль" textFill="#ababab">
+      <Label layoutX="217.0" layoutY="313.0" prefHeight="31.0" prefWidth="70.0" text="Пароль" textFill="#ababab">
          <font>
             <Font name="Web Serveroff Regular" size="24.0" />
          </font>
       </Label>
-      <TextField fx:id="secondNameReg" layoutX="217.0" layoutY="138.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
-      <Label layoutX="217.0" layoutY="106.0" prefHeight="31.0" prefWidth="78.0" text="Фамилия" textFill="#ababab">
+      <TextField fx:id="firstNameReg" layoutX="217.0" layoutY="138.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
+      <Label layoutX="217.0" layoutY="176.0" prefHeight="31.0" prefWidth="78.0" text="Фамилия" textFill="#ababab">
          <font>
             <Font name="Web Serveroff Regular" size="24.0" />
          </font>
       </Label>
-      <TextField fx:id="nameReg" layoutX="217.0" layoutY="206.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
-      <Label layoutX="217.0" layoutY="174.0" prefHeight="31.0" prefWidth="49.0" text="Имя" textFill="#ababab">
+      <TextField fx:id="secondNameReg" layoutX="217.0" layoutY="206.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
+      <Label layoutX="217.0" layoutY="108.0" prefHeight="31.0" prefWidth="49.0" text="Имя" textFill="#ababab">
          <font>
             <Font name="Web Serveroff Regular" size="24.0" />
          </font>
       </Label>
-      <TextField fx:id="mailReg" layoutX="217.0" layoutY="343.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
-      <Label layoutX="217.0" layoutY="311.0" prefHeight="31.0" prefWidth="49.0" text="E-mail" textFill="#ababab">
+      <TextField fx:id="mailReg" layoutX="217.0" layoutY="412.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
+      <Label layoutX="217.0" layoutY="382.0" prefHeight="31.0" prefWidth="49.0" text="E-mail" textFill="#ababab">
          <font>
             <Font name="Web Serveroff Regular" size="24.0" />
          </font>

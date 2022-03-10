@@ -11,26 +11,33 @@ import ru.bookshelf.client.domain.entity.Person;
 import ru.bookshelf.client.service.AlertService;
 import ru.bookshelf.client.service.LoadSceneService;
 
-import java.util.Optional;
-
 public class RegController {
-    @FXML
-    private PasswordField passReg;
-    @FXML
-    private TextField loginReg;
+
+
+
     @FXML
     private Button buttonReg;
     @FXML
     private Button backToAuthButtonReg;
     @FXML
+    private TextField firstNameReg;
+    @FXML
     private TextField secondNameReg;
     @FXML
-    private TextField nameReg;
+    private TextField loginReg;
     @FXML
     private TextField mailReg;
+    @FXML
+    private PasswordField passReg;
 
-    FXMLLoader loader = new FXMLLoader();
-    Stage stage = new Stage();
+
+    FXMLLoader loader;
+    Stage stage;
+//    private final LoadSceneService loadSceneService;
+//
+//    public RegController(LoadSceneService loadSceneService) {
+//        this.loadSceneService = loadSceneService;
+//    }
 
     @FXML
     void initialize() {
@@ -46,13 +53,13 @@ public class RegController {
                     if (passReg.getText().trim().isEmpty()
                             || loginReg.getText().trim().isEmpty()
                             || secondNameReg.getText().trim().isEmpty()
-                            || nameReg.getText().trim().isEmpty()
+                            || firstNameReg.getText().trim().isEmpty()
                             || mailReg.getText().trim().isEmpty()) {
                         AlertService alertService = new AlertService();
                         alertService.showAlert(Alert.AlertType.INFORMATION, "Ошибка", "Вы заполнили не все поля");
                     } else {
                         Person person = new Person();
-                        person.setFirstName(nameReg.getText());
+                        person.setFirstName(firstNameReg.getText());
                         person.setSecondName(secondNameReg.getText());
                         person.setLogin(loginReg.getText());
                         person.setMail(mailReg.getText());
@@ -100,7 +107,7 @@ public class RegController {
                             AlertService alertService = new AlertService();
                             alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Логин, введённый вами уже используются. Пожалуйста, введите другие данные.");
                             LoadSceneService loadSceneService = new LoadSceneService();
-                            loadSceneService.clearFields(passReg, loginReg, secondNameReg, nameReg, mailReg);
+                            loadSceneService.clearFields(firstNameReg,secondNameReg,loginReg, passReg, mailReg);
                         }
                     }
                 });
