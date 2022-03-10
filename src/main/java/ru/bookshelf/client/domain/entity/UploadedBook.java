@@ -1,18 +1,19 @@
 package ru.bookshelf.client.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@Builder(toBuilder = true)
 public class UploadedBook {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,8 +21,8 @@ public class UploadedBook {
 
   private String author;
   private String title;
-  private String publish_date;
+  private LocalDate publishDate;
   @Lob
   @Type(type = "org.hibernate.type.TextType")
-  private byte[] file_data;
+  private byte[] fileData;
 }

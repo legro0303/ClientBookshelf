@@ -23,6 +23,7 @@
         <springdoc.swagger.version>1.5.13</springdoc.swagger.version>
         <unirest.version>1.4.9</unirest.version>
         <jackson.version>2.13.0</jackson.version>
+        <commons.io.version>2.11.0</commons.io.version>
         <spring.test.version>5.3.16</spring.test.version>
 
 
@@ -78,6 +79,18 @@
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- web flux -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+            <version>${spring.boot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-netty</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -154,6 +167,13 @@
             <artifactId>jackson-annotations</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        <!-- commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+
         <!--tests-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

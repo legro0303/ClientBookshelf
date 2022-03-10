@@ -1,4 +1,3 @@
 client:
   port: ${app.port}
   forward-headers-strategy: framework
-
