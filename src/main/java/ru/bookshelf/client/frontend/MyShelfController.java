@@ -5,19 +5,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
+import net.rgielen.fxweaver.core.FxWeaver;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ru.bookshelf.client.domain.entity.UploadedBook;
 import ru.bookshelf.client.service.FileUploadService;
-import ru.bookshelf.client.service.LoadSceneService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MyShelfController {
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@FxmlView("/FXML/myShelf.fxml")
+public class MyShelfController extends BaseController {
+    @Autowired
+    private FxWeaver fxWeaver;
 
     @FXML private Button myShelfBackButton;
     @FXML private TableView<UploadedBook> libTable;
@@ -28,9 +36,6 @@ public class MyShelfController {
     @FXML private ScrollBar dataScroll;
 
     private String path = new String();
-
-    FXMLLoader loader = new FXMLLoader();
-    Stage stage = new Stage();
 
     @FXML
     void initialize() {
@@ -82,9 +87,11 @@ public class MyShelfController {
 
         myShelfBackButton.setOnAction(
                 actionEvent -> {
-                    LoadSceneService loadSceneService = new LoadSceneService();
-                    loadSceneService.setScene(loader, myShelfBackButton, "/FXML/mainMenu.fxml",
-                            stage, "Главное меню");
+                    try {
+                        setScene(myShelfBackButton,"Главное меню", MainMenuController.class, fxWeaver);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     // books = (Long) countOfBooksResult.getObject().get("count");
                 });
     }

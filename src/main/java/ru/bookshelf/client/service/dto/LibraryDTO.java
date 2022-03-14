@@ -2,7 +2,6 @@ package ru.bookshelf.client.service.dto;
 
 import lombok.*;
 
-import java.io.File;
 import java.time.LocalDate;
 
 @Data

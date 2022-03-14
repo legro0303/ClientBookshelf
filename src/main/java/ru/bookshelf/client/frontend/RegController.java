@@ -4,44 +4,42 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
+import net.rgielen.fxweaver.core.FxWeaver;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ru.bookshelf.client.domain.entity.Person;
 import ru.bookshelf.client.service.AlertService;
-import ru.bookshelf.client.service.LoadSceneService;
 
 import java.util.Optional;
 
-public class RegController {
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@FxmlView("/FXML/registration.fxml")
+public class RegController extends BaseController {
+    @Autowired
+    private FxWeaver fxWeaver;
 
-
-    @FXML
-    private Button buttonReg;
-    @FXML
-    private Button backToAuthButtonReg;
-    @FXML
-    private TextField firstNameReg;
-    @FXML
-    private TextField secondNameReg;
-    @FXML
-    private TextField loginReg;
-    @FXML
-    private TextField mailReg;
-    @FXML
-    private PasswordField passReg;
-
-
-    FXMLLoader loader = new FXMLLoader();
-    Stage stage = new Stage();
+    @FXML private Button buttonReg;
+    @FXML private Button backToAuthButtonReg;
+    @FXML private TextField firstNameReg;
+    @FXML private TextField secondNameReg;
+    @FXML private TextField loginReg;
+    @FXML private TextField mailReg;
+    @FXML private PasswordField passReg;
 
     @FXML
     void initialize() {
         backToAuthButtonReg.setOnAction(
                 actionEvent -> {
-                    LoadSceneService loadSceneService = new LoadSceneService();
-                    loadSceneService.setScene(loader, backToAuthButtonReg, "/FXML/authorization.fxml",
-                            stage, "Авторизация");
+                    try {
+                        setScene(backToAuthButtonReg,"Авторизация", AuthController.class, fxWeaver);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 });
 
         buttonReg.setOnAction(
@@ -94,15 +92,16 @@ public class RegController {
                             AlertService alertService = new AlertService();
                             Optional<ButtonType> result = alertService.showAlert(Alert.AlertType.INFORMATION, "Вы зарегистрированы", "Успех! Вы зарегистрированы", true);
                             if (result.get() == ButtonType.OK) {
-                                LoadSceneService loadSceneService = new LoadSceneService();
-                                loadSceneService.setScene(loader, backToAuthButtonReg, "/FXML/authorization.fxml",
-                                        stage, "Авторизация");
+                                try {
+                                    setScene(backToAuthButtonReg, "Авторизация", AuthController.class, fxWeaver);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         } else if (validationLogin == false) {
                             AlertService alertService = new AlertService();
                             alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Логин, введённый вами уже используются. Пожалуйста, введите другие данные.", false);
-                            LoadSceneService loadSceneService = new LoadSceneService();
-                            loadSceneService.clearFields(firstNameReg, secondNameReg, loginReg, passReg, mailReg);
+                            clearFields(firstNameReg, secondNameReg, loginReg, passReg, mailReg);
                         }
                     }
                 });

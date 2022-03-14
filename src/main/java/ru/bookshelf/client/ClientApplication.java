@@ -3,41 +3,41 @@ package ru.bookshelf.client;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
+import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
-import java.io.IOException;
+import net.rgielen.fxweaver.core.FxWeaver;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
+import ru.bookshelf.client.frontend.StartController;
 
 @OpenAPIDefinition(info = @Info(title = "Bookshelf service API", version = "1.0", description = "Bookshelf service Information"))
-@EnableJpaRepositories
 /** JavaFX App */
 public class ClientApplication extends Application {
-
-    private static Scene scene;
+    private ConfigurableApplicationContext context;
 
     @Override
-    public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 1280, 720);
-        stage.setScene(scene);
-        stage.setTitle("Стартовое меню");
-        stage.show();
+    public void init() throws Exception {
+        String[] args = getParameters().getRaw().toArray(new String[0]);
+        this.context = new SpringApplicationBuilder()
+                .sources(StartJavaFX.class)
+                .run(args);
     }
 
-    static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        FxWeaver fxWeaver = context.getBean(FxWeaver.class);
+        Parent root = fxWeaver.loadView(StartController.class);
+        Scene scene = new Scene(root, 1280, 720);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Стартовое меню");
+        primaryStage.show();
     }
 
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader =
-                new FXMLLoader(ClientApplication.class.getResource("/FXML/start.fxml"));
-        return fxmlLoader.load();
-    }
-
-    public static void main(String[] args) {
-        launch();
+    @Override
+    public void stop() throws Exception {
+        this.context.close();
+        Platform.exit();
     }
 }

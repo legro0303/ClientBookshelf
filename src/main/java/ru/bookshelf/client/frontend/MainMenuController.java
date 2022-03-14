@@ -1,42 +1,41 @@
 package ru.bookshelf.client.frontend;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Hyperlink;
-import javafx.stage.Stage;
-import ru.bookshelf.client.service.LoadSceneService;
+import net.rgielen.fxweaver.core.FxWeaver;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-public class MainMenuController {
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@FxmlView("/FXML/mainMenu.fxml")
+public class MainMenuController extends BaseController {
+    @Autowired
+    private FxWeaver fxWeaver;
 
-  @FXML private Hyperlink loadLinkMenu;
-  @FXML private Hyperlink myShelfLinkMenu;
-  @FXML private Hyperlink backLinkMenu;
+    @FXML private Hyperlink loadLinkMenu;
+    @FXML private Hyperlink myShelfLinkMenu;
+    @FXML private Hyperlink backLinkMenu;
 
-  FXMLLoader loader = new FXMLLoader();
-  Stage stage = new Stage();
+    @FXML
+    void initialize() {
 
-  @FXML
-  void initialize() {
+        loadLinkMenu.setOnAction(
+                actionEvent -> {
+                    setScene(loadLinkMenu, "Загрузка книг", LoadBookController.class, fxWeaver);
+                });
 
-    loadLinkMenu.setOnAction(
-        actionEvent -> {
-            LoadSceneService loadSceneService = new LoadSceneService();
-            loadSceneService.setScene(loader, loadLinkMenu, "/FXML/loadBook.fxml",
-                    stage, "Загрузка книг");
-        });
+        myShelfLinkMenu.setOnAction(
+                actionEvent -> {
+                    setScene(myShelfLinkMenu, "Библиотека книг", MyShelfController.class, fxWeaver);
+                });
 
-    myShelfLinkMenu.setOnAction(
-        actionEvent -> {
-            LoadSceneService loadSceneService = new LoadSceneService();
-            loadSceneService.setScene(loader, myShelfLinkMenu, "/FXML/myShelf.fxml",
-                    stage, "Библиотека книг");
-        });
-
-    backLinkMenu.setOnAction(
-        actionEvent -> {
-            LoadSceneService loadSceneService = new LoadSceneService();
-            loadSceneService.setScene(loader, myShelfLinkMenu, "/FXML/authorization.fxml",
-                    stage, "Авторизация");
-        });
-  }
+        backLinkMenu.setOnAction(
+                actionEvent -> {
+                    setScene(myShelfLinkMenu, "Авторизация", AuthController.class, fxWeaver);
+                });
+    }
 }
