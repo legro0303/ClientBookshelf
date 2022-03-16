@@ -4,17 +4,16 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @ToString
 @Builder(toBuilder = true)
-public class LibraryDTO {
+public class BookDTO {
     String author;
     String title;
     LocalDate publishDate;
-    String login;
+    String owner;
     byte[] fileData;
 }

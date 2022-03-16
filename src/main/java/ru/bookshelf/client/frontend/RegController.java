@@ -1,8 +1,5 @@
 package ru.bookshelf.client.frontend;
 
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import net.rgielen.fxweaver.core.FxWeaver;
@@ -10,9 +7,12 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import ru.bookshelf.client.domain.entity.Person;
+import org.springframework.web.reactive.function.client.WebClient;
 import ru.bookshelf.client.service.AlertService;
+import ru.bookshelf.client.service.dto.UserAuthDTO;
+import ru.bookshelf.client.service.dto.UserRegDTO;
 
 import java.util.Optional;
 
@@ -23,83 +23,80 @@ public class RegController extends BaseController {
     @Autowired
     private FxWeaver fxWeaver;
 
-    @FXML private Button buttonReg;
-    @FXML private Button backToAuthButtonReg;
-    @FXML private TextField firstNameReg;
-    @FXML private TextField secondNameReg;
-    @FXML private TextField loginReg;
-    @FXML private TextField mailReg;
-    @FXML private PasswordField passReg;
+    @Autowired
+    private WebClient webClient;
+
+    private final AlertService alertService;
+
+    @FXML
+    private Button buttonReg;
+    @FXML
+    private Button backToAuthButtonReg;
+    @FXML
+    private TextField firstNameReg;
+    @FXML
+    private TextField secondNameReg;
+    @FXML
+    private TextField loginReg;
+    @FXML
+    private TextField mailReg;
+    @FXML
+    private PasswordField passReg;
+
+    public RegController(AlertService alertService) {
+        this.alertService = alertService;
+    }
 
     @FXML
     void initialize() {
         backToAuthButtonReg.setOnAction(
                 actionEvent -> {
-                    try {
-                        setScene(backToAuthButtonReg,"Авторизация", AuthController.class, fxWeaver);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                        setScene(backToAuthButtonReg, "Авторизация", AuthController.class, fxWeaver);
                 });
 
         buttonReg.setOnAction(
                 actionEvent -> {
-                    if (passReg.getText().trim().isEmpty()
+                    if (firstNameReg.getText().trim().isEmpty()
+                            ||secondNameReg.getText().trim().isEmpty()
                             || loginReg.getText().trim().isEmpty()
-                            || secondNameReg.getText().trim().isEmpty()
-                            || firstNameReg.getText().trim().isEmpty()
+                            || passReg.getText().trim().isEmpty()
                             || mailReg.getText().trim().isEmpty()) {
-                        AlertService alertService = new AlertService();
                         alertService.showAlert(Alert.AlertType.INFORMATION, "Ошибка", "Вы заполнили не все поля", false);
                     } else {
-                        Person person = new Person();
-                        person.setFirstName(firstNameReg.getText());
-                        person.setSecondName(secondNameReg.getText());
-                        person.setLogin(loginReg.getText());
-                        person.setMail(mailReg.getText());
-                        person.setPassword(passReg.getText());
-                        JsonNode validationResult = new JsonNode(null);
-                        Boolean validationLogin;
-                        try {
-                            validationResult =
-                                    Unirest.post("http://localhost:8080/message/validation")
-                                            .header("accept", "application/json")
-                                            .field("firstName", person.getFirstName())
-                                            .field("secondName", person.getSecondName())
-                                            .field("login", person.getLogin())
-                                            .field("mail", person.getMail())
-                                            .field("password", person.getPassword())
-                                            .asJson()
-                                            .getBody();
+                        UserAuthDTO userAuthDTO = UserAuthDTO
+                                .builder()
+                                .login(loginReg.getText())
+                                .build();
 
-                        } catch (UnirestException e) {
-                            e.printStackTrace();
-                        }
-                        validationLogin = (Boolean) validationResult.getObject().get("validationLogin");
-                        if (validationLogin == true) {
-                            try {
-                                Unirest.post("http://localhost:8080/message/registration")
-                                        .header("accept", "application/json")
-                                        .field("firstName", person.getFirstName())
-                                        .field("secondName", person.getSecondName())
-                                        .field("login", person.getLogin())
-                                        .field("mail", person.getMail())
-                                        .field("password", person.getPassword())
-                                        .asJson();
-                            } catch (UnirestException e) {
-                                e.printStackTrace();
-                            }
-                            AlertService alertService = new AlertService();
-                            Optional<ButtonType> result = alertService.showAlert(Alert.AlertType.INFORMATION, "Вы зарегистрированы", "Успех! Вы зарегистрированы", true);
-                            if (result.get() == ButtonType.OK) {
-                                try {
-                                    setScene(backToAuthButtonReg, "Авторизация", AuthController.class, fxWeaver);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        } else if (validationLogin == false) {
-                            AlertService alertService = new AlertService();
+                        Boolean notRegisteredYet = webClient.post()
+                                .uri("http://localhost:10120/message/validation")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(userAuthDTO)
+                                .retrieve()
+                                .bodyToMono(Boolean.class)
+                                .block();
+
+                        if (notRegisteredYet == true) {
+                            UserRegDTO userRegDTO = UserRegDTO
+                                    .builder()
+                                    .firstName(firstNameReg.getText())
+                                    .secondName(secondNameReg.getText())
+                                    .login(loginReg.getText())
+                                    .password(passReg.getText())
+                                    .mail(mailReg.getText())
+                                    .build();
+
+                            webClient.post()
+                                    .uri("http://localhost:10120/message/registration")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .bodyValue(userRegDTO)
+                                    .retrieve()
+                                    .bodyToMono(Void.class)
+                                    .block();
+
+                            Optional<ButtonType> userClickAlert = alertService.showAlert(Alert.AlertType.INFORMATION, "Вы зарегистрированы", "Успех! Вы зарегистрированы", true);
+                            if (userClickAlert.get() == ButtonType.OK) {setScene(backToAuthButtonReg, "Авторизация", AuthController.class, fxWeaver);}
+                        } else if (notRegisteredYet == false) {
                             alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Логин, введённый вами уже используются. Пожалуйста, введите другие данные.", false);
                             clearFields(firstNameReg, secondNameReg, loginReg, passReg, mailReg);
                         }

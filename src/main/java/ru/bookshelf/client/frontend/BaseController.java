@@ -41,4 +41,9 @@ public abstract class BaseController {
         passReg.clear();
         mailReg.clear();
     }
+
+    public void clearFields(TextField login, PasswordField password) {
+        login.clear();
+        password.clear();
+    }
 }

@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ru.bookshelf.client.domain.entity.UploadedBook;
 import ru.bookshelf.client.service.FileUploadService;
+import ru.bookshelf.client.service.dto.BookDTO;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,11 +28,11 @@ public class MyShelfController extends BaseController {
     private FxWeaver fxWeaver;
 
     @FXML private Button myShelfBackButton;
-    @FXML private TableView<UploadedBook> libTable;
-    @FXML private TableColumn<UploadedBook, String> author;
-    @FXML private TableColumn<UploadedBook, String> title;
-    @FXML private TableColumn<UploadedBook, String> publishDate;
-    @FXML private TableColumn<UploadedBook, byte[]> fileData;
+    @FXML private TableView<BookDTO> libTable;
+    @FXML private TableColumn<BookDTO, String> author;
+    @FXML private TableColumn<BookDTO, String> title;
+    @FXML private TableColumn<BookDTO, String> publishDate;
+    @FXML private TableColumn<BookDTO, byte[]> fileData;
     @FXML private ScrollBar dataScroll;
 
     private String path = new String();
@@ -53,18 +53,18 @@ public class MyShelfController extends BaseController {
         }
         ObjectMapper mapper = new ObjectMapper();
 
-        List<UploadedBook> booksFromJson = new ArrayList<>();
+        List<BookDTO> booksFromJson = new ArrayList<>();
 
         try {
-            booksFromJson = Arrays.asList(mapper.readValue(nodeOfBooks, UploadedBook[].class));
+            booksFromJson = Arrays.asList(mapper.readValue(nodeOfBooks, BookDTO[].class));
         } catch (JsonProcessingException e) {
             System.out.println("Невозможно считать книгу, ошибка" + e);
         }
 
-        author.setCellValueFactory(new PropertyValueFactory<UploadedBook, String>("author"));
-        title.setCellValueFactory(new PropertyValueFactory<UploadedBook, String>("title"));
-        publishDate.setCellValueFactory(new PropertyValueFactory<UploadedBook, String>("publishDate"));
-        fileData.setCellValueFactory(new PropertyValueFactory<UploadedBook, byte[]>("fileData"));
+        author.setCellValueFactory(new PropertyValueFactory<BookDTO, String>("author"));
+        title.setCellValueFactory(new PropertyValueFactory<BookDTO, String>("title"));
+        publishDate.setCellValueFactory(new PropertyValueFactory<BookDTO, String>("publishDate"));
+        fileData.setCellValueFactory(new PropertyValueFactory<BookDTO, byte[]>("fileData"));
         libTable.getItems().addAll(booksFromJson);
 
 
@@ -72,11 +72,11 @@ public class MyShelfController extends BaseController {
 
         libTable.setRowFactory(
                 tv -> {
-                    TableRow<UploadedBook> row = new TableRow<>();
+                    TableRow<BookDTO> row = new TableRow<>();
                     row.setOnMouseClicked(
                             event -> {
                                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                                    UploadedBook rowData = row.getItem();
+                                    BookDTO rowData = row.getItem();
                                     byte[] fileFromDB = rowData.getFileData();
                                     path = fileUploadService.convertToFile(fileFromDB);
 

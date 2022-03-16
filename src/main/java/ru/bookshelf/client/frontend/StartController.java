@@ -4,14 +4,11 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -24,7 +21,13 @@ public class StartController extends BaseController {
 
     @Autowired private FxWeaver fxWeaver;
 
+    private final AlertService alertService;
+
     @FXML private Button startButton;
+
+    public StartController(AlertService alertService) {
+        this.alertService = alertService;
+    }
 
     @FXML
     void initialize() {
@@ -34,7 +37,6 @@ public class StartController extends BaseController {
                     try {
                         req = Unirest.get("http://localhost:10120/message").asString();
                     } catch (UnirestException e) {
-                        AlertService alertService = new AlertService();
                         alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "В данный момент сервер не функционирует", false);
                         e.printStackTrace();
                     }

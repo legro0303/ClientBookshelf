@@ -17,7 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.bookshelf.client.service.AlertService;
-import ru.bookshelf.client.service.dto.LibraryDTO;
+import ru.bookshelf.client.service.dto.BookDTO;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -33,6 +33,11 @@ public class LoadBookController extends BaseController {
     @Autowired
     private Stage stage;
 
+    @Autowired
+    private WebClient webClient;
+
+    private final AlertService alertService;
+
     @FXML private Button loadBookBackButton;
     @FXML private Button loadBookButton;
     @FXML private TextField tbAuthor;
@@ -41,7 +46,8 @@ public class LoadBookController extends BaseController {
     @FXML private Button saveBookButton;
 
     private final String bookUrl;
-    public LoadBookController(@Value("${bookshelf.add-book-url}") String bookUrl) {
+    public LoadBookController(AlertService alertService, @Value("${bookshelf.add-book-url}") String bookUrl) {
+        this.alertService = alertService;
         this.bookUrl = bookUrl;
     }
 
@@ -54,11 +60,7 @@ public class LoadBookController extends BaseController {
     void initialize() {
         loadBookBackButton.setOnAction(
                 actionEvent -> {
-                    try {
                         setScene(loadBookBackButton,"Библиотека", MainMenuController.class, fxWeaver);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                 });
 
         loadBookButton.setOnAction(
@@ -71,13 +73,12 @@ public class LoadBookController extends BaseController {
                 });
         saveBookButton.setOnAction(
                 actionEvent -> {
-                    AlertService alertService = new AlertService();
                     if (tbAuthor.getText().trim().isEmpty()
                             || tbTitle.getText().trim().isEmpty()
                             || dpPublish_date.getValue() == null) {
                         alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Вы заполнили не все поля", false);
                     } else {
-//                        uploadedBook.setLogin(AuthController.user.getLogin());
+                       // uploadedBook.setLogin(AuthController.user.getLogin());
                         try {
                             file = new FileInputStream(new File(choosedFile.getAbsolutePath()));
                         } catch (FileNotFoundException | NullPointerException e) {
@@ -86,24 +87,19 @@ public class LoadBookController extends BaseController {
                             e.printStackTrace();
                         }
                         try {
-                            LibraryDTO libraryDTO = null;
-                            try {
-                                libraryDTO = LibraryDTO
+                              BookDTO bookDTO = BookDTO
                                         .builder()
                                         .author(tbAuthor.getText())
                                         .title(tbTitle.getText())
                                         .publishDate(LocalDate.parse(dpPublish_date.getValue().toString()))
-                                        .login("qwe") //TODO доделать получение логина пользователя
+                                        .owner("qwe") //TODO доделать получение логина пользователя
                                         .fileData(file.readAllBytes())
                                         .build();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            WebClient webClient = WebClient.builder().baseUrl(bookUrl).build();
 
                             webClient.post()
+                                    .uri(bookUrl)
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .bodyValue(libraryDTO)
+                                    .bodyValue(bookDTO)
                                     .retrieve()
                                     .bodyToMono(Void.class)
                                     .doOnSuccess(response -> alertService.showAlert(Alert.AlertType.INFORMATION, "Успех!", "Книга успешно загружена!", false))
