@@ -2,6 +2,7 @@ package ru.bookshelf.client.frontend;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import ru.bookshelf.client.service.dto.UserRegDTO;
 
 import java.util.Optional;
 
+@Slf4j
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @FxmlView("/FXML/registration.fxml")
@@ -67,7 +69,7 @@ public class RegController extends BaseController {
                             || loginReg.getText().trim().isEmpty()
                             || passReg.getText().trim().isEmpty()
                             || mailReg.getText().trim().isEmpty()) {
-                        alertService.showAlert(Alert.AlertType.INFORMATION, "Ошибка", "Вы заполнили не все поля", false);
+                        alertService.showAlert(Alert.AlertType.INFORMATION, "Пустые поля при регистрации", "Вы заполнили не все поля", false);
                     } else {
                         UserAuthDTO userAuthDTO = UserAuthDTO
                                 .builder()
@@ -80,6 +82,7 @@ public class RegController extends BaseController {
                                 .bodyValue(userAuthDTO)
                                 .retrieve()
                                 .bodyToMono(Boolean.class)
+                                .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для проверки создан ли пользователь - [{}]" , exception.getMessage()))
                                 .block();
 
                         if (notRegisteredYet == true) {
@@ -98,6 +101,7 @@ public class RegController extends BaseController {
                                     .bodyValue(userRegDTO)
                                     .retrieve()
                                     .bodyToMono(Void.class)
+                                    .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для регистрации пользователя - [{}]" , exception.getMessage()))
                                     .block();
 
                             Optional<ButtonType> userClickAlert = alertService.showAlert(Alert.AlertType.INFORMATION, "Вы зарегистрированы", "Успех! Вы зарегистрированы", true);
@@ -105,7 +109,7 @@ public class RegController extends BaseController {
                                 setScene(backToAuthButtonReg, "Авторизация", AuthController.class, fxWeaver);
                             }
                         } else if (notRegisteredYet == false) {
-                            alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Логин, введённый вами уже используются. Пожалуйста, введите другие данные.", false);
+                            alertService.showAlert(Alert.AlertType.ERROR, "Пользователь уже зарегистрирован", "Логин, введённый вами уже используются. Пожалуйста, введите другие данные.", false);
                             clearFields(firstNameReg, secondNameReg, loginReg, passReg, mailReg);
                         }
                     }

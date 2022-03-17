@@ -1,0 +1,41 @@
+Configutation:
+  name: Default
+  Properties:
+    Property:
+      name: log-path
+      value: "logs"
+  Appenders:
+    Console:
+      name: Console_Appender
+      target: SYSTEM_OUT
+      PatternLayout:
+        #[%-5level] [INFO - DEBUG...] тоже что и %p
+        #%d{yyyy-MM-dd HH:mm:ss.SSS}  2022-03-02 12:13:42.445
+        #[%t]— название потока
+        #%c{1} - имя пакета
+        #%msg%n - %сообщение для лога%перевод строки
+        pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
+    RollingFile:
+      name: RollingFile_Appender
+      fileName: ${log-path}/rollingfile.log
+      filePattern: "${log-path}/archive/rollingfile.log.%d{yyyy-MM-dd-hh-mm}.gz"
+      PatternLayout:
+        pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
+      Policies:
+        SizeBasedTriggeringPolicy:
+          size: 1 MB
+      DefaultRollOverStrategy:
+        max: 30
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        - ref: Console_Appender
+        - ref: RollingFile_Appender
+    Logger:
+      name: ru.iconsoft.signserv
+      additivity: false
+      level: debug
+      AppenderRef:
+        - ref: RollingFile_Appender
+          level: debug

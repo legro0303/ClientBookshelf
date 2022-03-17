@@ -7,6 +7,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @FxmlView("/FXML/myShelf.fxml")
@@ -48,7 +50,7 @@ public class MyShelfController extends BaseController {
     void initialize() {
         String nodeOfBooks = new String();
 
-        try {
+        try {//TODO переделать запрос и добавить обработку ошибки
             nodeOfBooks =
                     Unirest.get(bookGet)
                             .header("accept", "application/json")
@@ -65,7 +67,7 @@ public class MyShelfController extends BaseController {
         try {
             booksFromJson = Arrays.asList(mapper.readValue(nodeOfBooks, BookDTO[].class));
         } catch (JsonProcessingException e) {
-            System.out.println("Невозможно считать книгу, ошибка" + e);
+            log.error("Невозможно считать книгу - [{}] ", e);
         }
 
         author.setCellValueFactory(new PropertyValueFactory<BookDTO, String>("author"));
@@ -94,11 +96,7 @@ public class MyShelfController extends BaseController {
 
         myShelfBackButton.setOnAction(
                 actionEvent -> {
-                    try {
                         setScene(myShelfBackButton,"Главное меню", MainMenuController.class, fxWeaver);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                     // books = (Long) countOfBooksResult.getObject().get("count");
                 });
     }

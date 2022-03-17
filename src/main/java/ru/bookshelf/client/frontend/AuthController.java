@@ -2,6 +2,7 @@ package ru.bookshelf.client.frontend;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ru.bookshelf.client.service.AlertService;
 import ru.bookshelf.client.service.dto.UserAuthDTO;
 
+@Slf4j
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @FxmlView("/FXML/authorization.fxml")
@@ -25,8 +27,6 @@ public class AuthController extends BaseController {
     private WebClient webClient;
 
     private final AlertService alertService;
-
-
 
     @FXML
     private PasswordField passAuth;
@@ -65,12 +65,12 @@ public class AuthController extends BaseController {
                             .bodyValue(userAuthDTO)
                             .retrieve()
                             .bodyToMono(Boolean.class)
+                            .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для авторизации пользователя - [{}]" , exception.getMessage()))
                             .block();
-
                     if (result == true) {
                         setScene(buttonAuth, "Главное меню", MainMenuController.class, fxWeaver);
                     } else {
-                        alertService.showAlert(Alert.AlertType.ERROR, "Ошибка",
+                        alertService.showAlert(Alert.AlertType.ERROR, "Ошибка авторизации",
                                 "Вы ввели неверный логин или пароль, пожалуйста, попробуйте ввести данные ещё раз.", false);
                         clearFields(loginAuth, passAuth);
                     }

@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.Optional;
 
+@Slf4j
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @FxmlView("/FXML/loadBook.fxml")
@@ -78,40 +80,44 @@ public class LoadBookController extends BaseController {
                     if (tbAuthor.getText().trim().isEmpty()
                             || tbTitle.getText().trim().isEmpty()
                             || dpPublishDate.getValue() == null) {
-                        alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Вы заполнили не все поля", false);
+                        alertService.showAlert(Alert.AlertType.ERROR, "Пустые поля при загрузке книги", "Вы заполнили не все поля", false);
                     } else {
                        // uploadedBook.setLogin(AuthController.user.getLogin());
                         try {
                             file = new FileInputStream(new File(choosedFile.getAbsolutePath()));
                         } catch (FileNotFoundException | NullPointerException e) {
-                            alertService.showAlert(Alert.AlertType.ERROR, "Ошибка",
+                            alertService.showAlert(Alert.AlertType.ERROR, "Книга не загружена",
                                     "Пожалуйста, загрузите книгу прежде чем сохранить её в библиотеку", false);
-                            e.printStackTrace();
+                            log.error("Загружаемый файл не найден или не выбран пользователем при загрузке - [{}]" , e.getMessage());
                         }
-                        try {
-                              BookDTO bookDTO = BookDTO
-                                        .builder()
-                                        .author(tbAuthor.getText())
-                                        .title(tbTitle.getText())
-                                        .publishDate(LocalDate.parse(dpPublishDate.getValue().toString()))
-                                        .owner("qwe") //TODO доделать получение логина пользователя
-                                        .fileData(file.readAllBytes())
-                                        .build();
 
-                           webClient.post()
+                        BookDTO bookDTO = null;
+                        try {
+                            bookDTO = BookDTO
+                                      .builder()
+                                      .author(tbAuthor.getText())
+                                      .title(tbTitle.getText())
+                                      .publishDate(LocalDate.parse(dpPublishDate.getValue().toString()))
+                                      .owner("qwe") //TODO доделать получение логина пользователя
+                                      .fileData(file.readAllBytes())
+                                      .build();
+                        } catch (IOException e) {
+                            log.error("Ошибка при чтении книги из директории [{}]", e);
+                        }
+
+                        webClient.post()
                                     .uri(bookAdd)
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .bodyValue(bookDTO)
                                     .retrieve()
                                     .bodyToMono(Void.class)
+                                    .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для загрузки книги - [{}]" , exception.getMessage()))
                                     .block();
-                            Optional<ButtonType> userClickAlert =  alertService.showAlert(Alert.AlertType.INFORMATION, "Успех!", "Книга успешно загружена!", true);
+                            Optional<ButtonType> userClickAlert =  alertService.showAlert(Alert.AlertType.INFORMATION, "Книга загружена!", "Книга успешно загружена!", true);
                             if (userClickAlert.get() == ButtonType.OK) {
                                 clearFields(tbAuthor,tbTitle, dpPublishDate);
                             }
-                         } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+
                     }
                 });
     }

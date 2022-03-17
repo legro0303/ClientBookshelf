@@ -6,6 +6,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.bookshelf.client.service.AlertService;
 
+@Slf4j
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @FxmlView("/FXML/start.fxml")
@@ -37,14 +39,10 @@ public class StartController extends BaseController {
                     try {
                         req = Unirest.get("http://localhost:10120/message").asString();//TODO понять как определять работу сервера
                     } catch (UnirestException e) {
-                        alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "В данный момент сервер не функционирует", false);
+                        alertService.showAlert(Alert.AlertType.ERROR, "Сервер не работает", "В данный момент сервер не функционирует", false);
                         e.printStackTrace();
                     }
-                    try {
                         setScene(startButton, "Авторизация", AuthController.class, fxWeaver);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                 });
     }
 }
