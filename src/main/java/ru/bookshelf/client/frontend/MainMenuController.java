@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import ru.bookshelf.client.service.repository.UserAuthRepository;
 
 @Slf4j
 @Component
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 public class MainMenuController extends BaseController {
     @Autowired
     private FxWeaver fxWeaver;
+
+    private UserAuthRepository userAuthRepository;
 
     @FXML private Hyperlink loadLinkMenu;
     @FXML private Hyperlink myShelfLinkMenu;
@@ -37,6 +40,7 @@ public class MainMenuController extends BaseController {
 
         backLinkMenu.setOnAction(
                 actionEvent -> {
+                    userAuthRepository.deleteUser();
                     setScene(myShelfLinkMenu, "Авторизация", AuthController.class, fxWeaver);
                 });
     }

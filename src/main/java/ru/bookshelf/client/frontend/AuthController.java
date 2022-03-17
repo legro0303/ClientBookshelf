@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.bookshelf.client.service.AlertService;
 import ru.bookshelf.client.service.dto.UserAuthDTO;
+import ru.bookshelf.client.service.repository.UserAuthRepository;
 
 @Slf4j
 @Component
@@ -27,6 +28,7 @@ public class AuthController extends BaseController {
     private WebClient webClient;
 
     private final AlertService alertService;
+    private final UserAuthRepository userAuthRepository;
 
     @FXML
     private PasswordField passAuth;
@@ -39,8 +41,9 @@ public class AuthController extends BaseController {
 
     private final String authUser;
 
-    public AuthController(AlertService alertService, @Value("${bookshelf.user.authorization}") String authUser) {
+    public AuthController(AlertService alertService, UserAuthRepository userAuthRepository, @Value("${bookshelf.user.authorization}") String authUser) {
         this.alertService = alertService;
+        this.userAuthRepository = userAuthRepository;
         this.authUser = authUser;
     }
 
@@ -58,6 +61,7 @@ public class AuthController extends BaseController {
                             .login(loginAuth.getText())
                             .password(passAuth.getText())
                             .build();
+                    userAuthRepository.addUser(userAuthDTO);
 
                     Boolean result = webClient.post()
                             .uri(authUser)

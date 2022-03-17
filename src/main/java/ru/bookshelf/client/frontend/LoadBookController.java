@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.bookshelf.client.service.AlertService;
 import ru.bookshelf.client.service.dto.BookDTO;
+import ru.bookshelf.client.service.repository.UserAuthRepository;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -36,8 +37,7 @@ public class LoadBookController extends BaseController {
     @Autowired
     private WebClient webClient;
 
-    @Autowired
-    private AuthController authController;
+    private final UserAuthRepository userAuthRepository;
 
     private final AlertService alertService;
 
@@ -52,7 +52,8 @@ public class LoadBookController extends BaseController {
     private final String bookAdd;
 
 
-    public LoadBookController(AlertService alertService, @Value("${bookshelf.book.add}") String bookAdd) {
+    public LoadBookController(UserAuthRepository userAuthRepository, AlertService alertService, @Value("${bookshelf.book.add}") String bookAdd) {
+        this.userAuthRepository = userAuthRepository;
         this.alertService = alertService;
         this.bookAdd = bookAdd;
     }
@@ -98,7 +99,7 @@ public class LoadBookController extends BaseController {
                                       .author(tbAuthor.getText())
                                       .title(tbTitle.getText())
                                       .publishDate(LocalDate.parse(dpPublishDate.getValue().toString()))
-                                      .owner("qwe") //TODO доделать получение логина пользователя
+                                      .owner(userAuthRepository.getUser().getLogin()) //TODO доделать получение логина пользователя
                                       .fileData(file.readAllBytes())
                                       .build();
                         } catch (IOException e) {
