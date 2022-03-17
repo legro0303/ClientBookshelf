@@ -1,11 +1,11 @@
 package ru.bookshelf.client.frontend;
 
-import com.mashape.unirest.http.JsonNode;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
@@ -26,6 +26,8 @@ public class AuthController extends BaseController {
 
     private final AlertService alertService;
 
+
+
     @FXML
     private PasswordField passAuth;
     @FXML
@@ -35,8 +37,11 @@ public class AuthController extends BaseController {
     @FXML
     private Hyperlink linkAuth;
 
-    public AuthController(AlertService alertService) {
+    private final String authUser;
+
+    public AuthController(AlertService alertService, @Value("${bookshelf.user.authorization}") String authUser) {
         this.alertService = alertService;
+        this.authUser = authUser;
     }
 
     @FXML
@@ -48,16 +53,16 @@ public class AuthController extends BaseController {
 
         buttonAuth.setOnAction(
                 actionEvent -> {
-                    UserAuthDTO userAuth = UserAuthDTO
+                    UserAuthDTO userAuthDTO = UserAuthDTO
                             .builder()
                             .login(loginAuth.getText())
                             .password(passAuth.getText())
                             .build();
 
                     Boolean result = webClient.post()
-                            .uri("http://localhost:10120/message/authorization")
+                            .uri(authUser)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(userAuth)
+                            .bodyValue(userAuthDTO)
                             .retrieve()
                             .bodyToMono(Boolean.class)
                             .block();

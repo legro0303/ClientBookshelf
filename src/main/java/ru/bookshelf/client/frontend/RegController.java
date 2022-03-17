@@ -5,6 +5,7 @@ import javafx.scene.control.*;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
@@ -43,21 +44,26 @@ public class RegController extends BaseController {
     @FXML
     private PasswordField passReg;
 
-    public RegController(AlertService alertService) {
+    private final String userValid;
+    private final String userReg;
+
+    public RegController(AlertService alertService, @Value("${bookshelf.user.validation}") String userValid, @Value("${bookshelf.user.registration}") String userReg) {
         this.alertService = alertService;
+        this.userValid = userValid;
+        this.userReg = userReg;
     }
 
     @FXML
     void initialize() {
         backToAuthButtonReg.setOnAction(
                 actionEvent -> {
-                        setScene(backToAuthButtonReg, "Авторизация", AuthController.class, fxWeaver);
+                    setScene(backToAuthButtonReg, "Авторизация", AuthController.class, fxWeaver);
                 });
 
         buttonReg.setOnAction(
                 actionEvent -> {
                     if (firstNameReg.getText().trim().isEmpty()
-                            ||secondNameReg.getText().trim().isEmpty()
+                            || secondNameReg.getText().trim().isEmpty()
                             || loginReg.getText().trim().isEmpty()
                             || passReg.getText().trim().isEmpty()
                             || mailReg.getText().trim().isEmpty()) {
@@ -69,7 +75,7 @@ public class RegController extends BaseController {
                                 .build();
 
                         Boolean notRegisteredYet = webClient.post()
-                                .uri("http://localhost:10120/message/validation")
+                                .uri(userValid)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(userAuthDTO)
                                 .retrieve()
@@ -87,7 +93,7 @@ public class RegController extends BaseController {
                                     .build();
 
                             webClient.post()
-                                    .uri("http://localhost:10120/message/registration")
+                                    .uri(userReg)
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .bodyValue(userRegDTO)
                                     .retrieve()
@@ -95,7 +101,9 @@ public class RegController extends BaseController {
                                     .block();
 
                             Optional<ButtonType> userClickAlert = alertService.showAlert(Alert.AlertType.INFORMATION, "Вы зарегистрированы", "Успех! Вы зарегистрированы", true);
-                            if (userClickAlert.get() == ButtonType.OK) {setScene(backToAuthButtonReg, "Авторизация", AuthController.class, fxWeaver);}
+                            if (userClickAlert.get() == ButtonType.OK) {
+                                setScene(backToAuthButtonReg, "Авторизация", AuthController.class, fxWeaver);
+                            }
                         } else if (notRegisteredYet == false) {
                             alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Логин, введённый вами уже используются. Пожалуйста, введите другие данные.", false);
                             clearFields(firstNameReg, secondNameReg, loginReg, passReg, mailReg);

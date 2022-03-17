@@ -35,7 +35,7 @@ public class StartController extends BaseController {
                 actionEvent -> {
                     HttpResponse<String> req = null;
                     try {
-                        req = Unirest.get("http://localhost:10120/message").asString();
+                        req = Unirest.get("http://localhost:10120/message").asString();//TODO понять как определять работу сервера
                     } catch (UnirestException e) {
                         alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "В данный момент сервер не функционирует", false);
                         e.printStackTrace();

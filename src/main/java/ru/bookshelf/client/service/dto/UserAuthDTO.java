@@ -3,8 +3,6 @@ package ru.bookshelf.client.service.dto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.lang.annotation.Inherited;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

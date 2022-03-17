@@ -3,4 +3,11 @@ client:
   forward-headers-strategy: framework
 
 bookshelf:
-  add-book-url: ${book-add}
+  book:
+    add: ${add-book}
+    get: ${get-book}
+    delete: ${delete-book}
+  user:
+    registration: ${reg-user}
+    validation: ${valid-user}
+    authorization: ${auth-user}

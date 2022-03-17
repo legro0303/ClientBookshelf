@@ -10,6 +10,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -37,13 +38,19 @@ public class MyShelfController extends BaseController {
 
     private String path = new String();
 
+    private final String bookGet;
+
+    public MyShelfController( @Value("${bookshelf.book.get}") String bookGet) {
+        this.bookGet = bookGet;
+    }
+
     @FXML
     void initialize() {
         String nodeOfBooks = new String();
 
         try {
             nodeOfBooks =
-                    Unirest.get("http://localhost:8080/bookshelf/books")
+                    Unirest.get(bookGet)
                             .header("accept", "application/json")
                             .asString()
                             .getBody();

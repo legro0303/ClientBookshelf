@@ -1,10 +1,7 @@
 package ru.bookshelf.client.frontend;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxWeaver;
@@ -21,6 +18,7 @@ import ru.bookshelf.client.service.dto.BookDTO;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
@@ -36,22 +34,26 @@ public class LoadBookController extends BaseController {
     @Autowired
     private WebClient webClient;
 
+    @Autowired
+    private AuthController authController;
+
     private final AlertService alertService;
+
 
     @FXML private Button loadBookBackButton;
     @FXML private Button loadBookButton;
     @FXML private TextField tbAuthor;
     @FXML private TextField tbTitle;
-    @FXML private DatePicker dpPublish_date;
+    @FXML private DatePicker dpPublishDate;
     @FXML private Button saveBookButton;
 
-    private final String bookUrl;
-    public LoadBookController(AlertService alertService, @Value("${bookshelf.add-book-url}") String bookUrl) {
+    private final String bookAdd;
+
+
+    public LoadBookController(AlertService alertService, @Value("${bookshelf.book.add}") String bookAdd) {
         this.alertService = alertService;
-        this.bookUrl = bookUrl;
+        this.bookAdd = bookAdd;
     }
-
-
     FileChooser fileChooser = new FileChooser();
     File choosedFile;
     InputStream file;
@@ -75,7 +77,7 @@ public class LoadBookController extends BaseController {
                 actionEvent -> {
                     if (tbAuthor.getText().trim().isEmpty()
                             || tbTitle.getText().trim().isEmpty()
-                            || dpPublish_date.getValue() == null) {
+                            || dpPublishDate.getValue() == null) {
                         alertService.showAlert(Alert.AlertType.ERROR, "Ошибка", "Вы заполнили не все поля", false);
                     } else {
                        // uploadedBook.setLogin(AuthController.user.getLogin());
@@ -91,23 +93,23 @@ public class LoadBookController extends BaseController {
                                         .builder()
                                         .author(tbAuthor.getText())
                                         .title(tbTitle.getText())
-                                        .publishDate(LocalDate.parse(dpPublish_date.getValue().toString()))
+                                        .publishDate(LocalDate.parse(dpPublishDate.getValue().toString()))
                                         .owner("qwe") //TODO доделать получение логина пользователя
                                         .fileData(file.readAllBytes())
                                         .build();
 
-                            webClient.post()
-                                    .uri(bookUrl)
+                           webClient.post()
+                                    .uri(bookAdd)
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .bodyValue(bookDTO)
                                     .retrieve()
                                     .bodyToMono(Void.class)
-                                    .doOnSuccess(response -> alertService.showAlert(Alert.AlertType.INFORMATION, "Успех!", "Книга успешно загружена!", false))
-                                    .onErrorMap(throwable -> {
-                                        return throwable;
-                                    })
                                     .block();
-                        } catch (Exception e) {
+                            Optional<ButtonType> userClickAlert =  alertService.showAlert(Alert.AlertType.INFORMATION, "Успех!", "Книга успешно загружена!", true);
+                            if (userClickAlert.get() == ButtonType.OK) {
+                                clearFields(tbAuthor,tbTitle, dpPublishDate);
+                            }
+                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }

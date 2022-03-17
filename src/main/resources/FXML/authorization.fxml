@@ -17,8 +17,8 @@
             <Image url="@../assets/2.jpg" />
          </image>
       </ImageView>
-      <PasswordField fx:id="passAuth" layoutX="217.0" layoutY="335.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
       <TextField fx:id="loginAuth" layoutX="217.0" layoutY="224.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
+      <PasswordField fx:id="passAuth" layoutX="217.0" layoutY="335.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
       <Button fx:id="buttonAuth" layoutX="217.0" layoutY="508.0" mnemonicParsing="false" prefHeight="53.0" prefWidth="285.0" stylesheets="@../css/Styles.css" text="Авторизация" textFill="WHITE">
          <font>
             <Font size="24.0" />
