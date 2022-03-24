@@ -1,7 +1,6 @@
 package ru.bookshelf.client.frontend;
 
 import com.dansoftware.pdfdisplayer.PDFDisplayer;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -28,43 +27,28 @@ import java.util.List;
 @Slf4j
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-@FxmlView("/FXML/myShelf.fxml")
-public class MyShelfController extends BaseController {
-    @Autowired
-    private FxWeaver fxWeaver;
+@FxmlView("/FXML/library.fxml")
+public class LibraryController extends BaseController {
+    @Autowired private FxWeaver fxWeaver;
+    @Autowired private WebClient webClient;
 
-    @Autowired
-    private WebClient webClient;
+    @FXML private ScrollBar dataScroll;
+    @FXML private Button backButton;
+    @FXML private Button deletingButton;
+    @FXML private TableView<BookDTO> libTable;
+    @FXML private TableColumn<BookDTO, Long> id;
+    @FXML private TableColumn<BookDTO, String> title;
+    @FXML private TableColumn<BookDTO, String> author;
+    @FXML private TableColumn<BookDTO, String> publishDate;
 
     private final AlertService alertService;
     private final FileUploadService fileUploadService;
     private final UserAuthRepository userAuthRepository;
-
-    @FXML
-    private Button myShelfBackButton;
-    @FXML
-    private Button deleteButton;
-    @FXML
-    private TableView<BookDTO> libTable;
-    @FXML
-    private TableColumn<BookDTO, Long> id;
-    @FXML
-    private TableColumn<BookDTO, String> author;
-    @FXML
-    private TableColumn<BookDTO, String> title;
-    @FXML
-    private TableColumn<BookDTO, String> publishDate;
-    @FXML
-    private ScrollBar dataScroll;
-
-    private String path = new String();
-
     private final String bookGet;
     private final String bookGetBytes;
     private final String bookDelete;
 
-
-    public MyShelfController(AlertService alertService,
+    public LibraryController(AlertService alertService,
                              FileUploadService fileUploadService, UserAuthRepository userAuthRepository,
                              @Value("${bookshelf.book.get}") String bookGet,
                              @Value("${bookshelf.book.get-book-bytes}") String bookGetBytes,
@@ -94,7 +78,6 @@ public class MyShelfController extends BaseController {
 
         libTable.getItems().addAll(booksList);
 
-
         log.info("libtable имеет [{}]", libTable.getItems());
 
         libTable.setRowFactory(
@@ -109,7 +92,7 @@ public class MyShelfController extends BaseController {
                                             .bodyToMono(byte[].class)
                                             .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для получения всех книг - [{}]", exception.getMessage()))
                                             .block();
-                                    path = fileUploadService.convertToFile(qwe);
+                                    String path = fileUploadService.convertToFile(qwe);
                                     PDFDisplayer displayer = new PDFDisplayer();
                                     File file = new File(path);
                                     try {
@@ -124,32 +107,30 @@ public class MyShelfController extends BaseController {
                     return row;
                 });
 
-        myShelfBackButton.setOnAction(
+        backButton.setOnAction(
                 actionEvent -> {
-                    setScene(myShelfBackButton, "Главное меню", MainMenuController.class, fxWeaver);
-                    // books = (Long) countOfBooksResult.getObject().get("count");
+                    setScene(backButton, "Главное меню", MainMenuController.class, fxWeaver);
                 });
-    }
+        deletingButton.setOnAction(
+                actionEvent -> {
+                    BookDTO bookDTO = libTable.getSelectionModel().getSelectedItem();
+                    bookDTO.setOwner(userAuthRepository.getUser().getLogin());
 
-    @FXML
-    void deleteRowAction(ActionEvent event) {
-        BookDTO bookDTO = libTable.getSelectionModel().getSelectedItem();
-        bookDTO.setOwner(userAuthRepository.getUser().getLogin());
+                    Boolean bookWasDeleted = webClient.post()
+                            .uri(bookDelete)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(bookDTO)
+                            .retrieve()
+                            .bodyToMono(Boolean.class)
+                            .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для удаления книги - [{}]", exception.getMessage()))
+                            .block();
 
-        Boolean bookWasDeleted = webClient.post()
-                .uri(bookDelete)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(bookDTO)
-                .retrieve()
-                .bodyToMono(Boolean.class)
-                .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для удаления книги - [{}]", exception.getMessage()))
-                .block();
-
-        if (bookWasDeleted == true) {
-            libTable.getItems().removeAll(bookDTO);
-        } else if (bookWasDeleted == false) {
-            alertService.showAlert(Alert.AlertType.ERROR, "Ошибка удаления книги",
-                    "Вы не можете удалить данную книгу, так как не являетесь её владельцем", false);
-        }
+                    if (bookWasDeleted == true) {
+                        libTable.getItems().removeAll(bookDTO);
+                    } else if (bookWasDeleted == false) {
+                        alertService.showAlert(Alert.AlertType.ERROR, "Ошибка удаления книги",
+                                "Вы не можете удалить данную книгу, так как не являетесь её владельцем", false);
+                    }
+                });
     }
 }

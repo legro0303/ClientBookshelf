@@ -23,57 +23,46 @@ import java.util.Optional;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @FxmlView("/FXML/registration.fxml")
 public class RegController extends BaseController {
-    @Autowired
-    private FxWeaver fxWeaver;
+    @Autowired private FxWeaver fxWeaver;
+    @Autowired private WebClient webClient;
 
-    @Autowired
-    private WebClient webClient;
+    @FXML private Button backButton;
+    @FXML private Button registerUserButton;
+    @FXML private TextField mailTf;
+    @FXML private TextField loginTf;
+    @FXML private TextField firstNameTf;
+    @FXML private TextField secondNameTf;
+    @FXML private PasswordField passwordPf;
 
+    private final String userReg;
+    private final String userValid;
     private final AlertService alertService;
 
-    @FXML
-    private Button buttonReg;
-    @FXML
-    private Button backToAuthButtonReg;
-    @FXML
-    private TextField firstNameReg;
-    @FXML
-    private TextField secondNameReg;
-    @FXML
-    private TextField loginReg;
-    @FXML
-    private TextField mailReg;
-    @FXML
-    private PasswordField passReg;
-
-    private final String userValid;
-    private final String userReg;
-
-    public RegController(AlertService alertService, @Value("${bookshelf.user.validation}") String userValid, @Value("${bookshelf.user.registration}") String userReg) {
-        this.alertService = alertService;
-        this.userValid = userValid;
+    public RegController(@Value("${bookshelf.user.registration}") String userReg, @Value("${bookshelf.user.validation}") String userValid, AlertService alertService) {
         this.userReg = userReg;
+        this.userValid = userValid;
+        this.alertService = alertService;
     }
 
     @FXML
     void initialize() {
-        backToAuthButtonReg.setOnAction(
+        backButton.setOnAction(
                 actionEvent -> {
-                    setScene(backToAuthButtonReg, "Авторизация", AuthController.class, fxWeaver);
+                    setScene(backButton, "Авторизация", AuthController.class, fxWeaver);
                 });
 
-        buttonReg.setOnAction(
+        registerUserButton.setOnAction(
                 actionEvent -> {
-                    if (firstNameReg.getText().trim().isEmpty()
-                            || secondNameReg.getText().trim().isEmpty()
-                            || loginReg.getText().trim().isEmpty()
-                            || passReg.getText().trim().isEmpty()
-                            || mailReg.getText().trim().isEmpty()) {
+                    if (firstNameTf.getText().trim().isEmpty()
+                            || secondNameTf.getText().trim().isEmpty()
+                            || loginTf.getText().trim().isEmpty()
+                            || passwordPf.getText().trim().isEmpty()
+                            || mailTf.getText().trim().isEmpty()) {
                         alertService.showAlert(Alert.AlertType.INFORMATION, "Пустые поля при регистрации", "Вы заполнили не все поля", false);
                     } else {
                         UserAuthDTO userAuthDTO = UserAuthDTO
                                 .builder()
-                                .login(loginReg.getText())
+                                .login(loginTf.getText())
                                 .build();
 
                         Boolean notRegisteredYet = webClient.post()
@@ -82,17 +71,17 @@ public class RegController extends BaseController {
                                 .bodyValue(userAuthDTO)
                                 .retrieve()
                                 .bodyToMono(Boolean.class)
-                                .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для проверки создан ли пользователь - [{}]" , exception.getMessage()))
+                                .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для проверки создан ли пользователь - [{}]", exception.getMessage()))
                                 .block();
 
                         if (notRegisteredYet == true) {
                             UserRegDTO userRegDTO = UserRegDTO
                                     .builder()
-                                    .firstName(firstNameReg.getText())
-                                    .secondName(secondNameReg.getText())
-                                    .login(loginReg.getText())
-                                    .password(passReg.getText())
-                                    .mail(mailReg.getText())
+                                    .firstName(firstNameTf.getText())
+                                    .secondName(secondNameTf.getText())
+                                    .login(loginTf.getText())
+                                    .password(passwordPf.getText())
+                                    .mail(mailTf.getText())
                                     .build();
 
                             webClient.post()
@@ -101,16 +90,16 @@ public class RegController extends BaseController {
                                     .bodyValue(userRegDTO)
                                     .retrieve()
                                     .bodyToMono(Void.class)
-                                    .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для регистрации пользователя - [{}]" , exception.getMessage()))
+                                    .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для регистрации пользователя - [{}]", exception.getMessage()))
                                     .block();
 
                             Optional<ButtonType> userClickAlert = alertService.showAlert(Alert.AlertType.INFORMATION, "Вы зарегистрированы", "Успех! Вы зарегистрированы", true);
                             if (userClickAlert.get() == ButtonType.OK) {
-                                setScene(backToAuthButtonReg, "Авторизация", AuthController.class, fxWeaver);
+                                setScene(backButton, "Авторизация", AuthController.class, fxWeaver);
                             }
                         } else if (notRegisteredYet == false) {
                             alertService.showAlert(Alert.AlertType.ERROR, "Пользователь уже зарегистрирован", "Логин, введённый вами уже используются. Пожалуйста, введите другие данные.", false);
-                            clearFields(firstNameReg, secondNameReg, loginReg, passReg, mailReg);
+                            clearFields(firstNameTf, secondNameTf, loginTf, passwordPf, mailTf);
                         }
                     }
                 });

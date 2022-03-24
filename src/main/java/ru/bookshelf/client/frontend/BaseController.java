@@ -11,8 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public abstract class BaseController {
-    @Autowired
-    private Stage stage;
+    @Autowired private Stage stage;
 
     public void setScene(Button button, String title, Class controller, FxWeaver fxWeaver) {
         log.info("Загрузка сцены " + controller.getSimpleName());
@@ -26,7 +25,6 @@ public abstract class BaseController {
         } catch (Exception e) {
             log.error("Непредвиденная ошибка при загрузке сцены " + e);
         }
-
     }
 
     public void setScene(Hyperlink link, String title, Class controller, FxWeaver fxWeaver) {
@@ -41,7 +39,6 @@ public abstract class BaseController {
         } catch (Exception e) {
             log.error("Непредвиденная ошибка при загрузке сцены " + e);
         }
-
     }
 
     public void setScene(String title, PDFDisplayer displayer, FxWeaver fxWeaver) {
@@ -54,7 +51,6 @@ public abstract class BaseController {
         } catch (Exception e) {
             log.error("Непредвиденная ошибка при загрузке сцены " + e);
         }
-
     }
 
     public void clearFields(TextField firstNameReg, TextField secondNameReg, TextField loginReg, PasswordField passReg, TextField mailReg) {

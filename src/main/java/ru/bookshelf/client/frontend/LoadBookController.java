@@ -25,52 +25,42 @@ import java.util.Optional;
 @Slf4j
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-@FxmlView("/FXML/loadBook.fxml")
+@FxmlView("/FXML/loadingBook.fxml")
 public class LoadBookController extends BaseController {
+    @Autowired private Stage stage;
+    @Autowired private FxWeaver fxWeaver;
+    @Autowired private WebClient webClient;
 
-    @Autowired
-    private FxWeaver fxWeaver;
-    @Autowired
-    private Stage stage;
-    @Autowired
-    private WebClient webClient;
+    @FXML private TextField titleTf;
+    @FXML private TextField authorTf;
+    @FXML private Button backButton;
+    @FXML private Button savingBookButton;
+    @FXML private Button loadingBookButton;
+    @FXML private DatePicker publishDateDp;
 
-
-    @FXML
-    private Button loadBookBackButton;
-    @FXML
-    private Button loadBookButton;
-    @FXML
-    private TextField tbAuthor;
-    @FXML
-    private TextField tbTitle;
-    @FXML
-    private DatePicker dpPublishDate;
-    @FXML
-    private Button saveBookButton;
-
-    private final UserAuthRepository userAuthRepository;
-    private final AlertService alertService;
     private final String bookAdd;
-    FileChooser fileChooser = new FileChooser();//TODO правильно проинициализировать переменные
-    File choosedFile;
-    InputStream file;
+    private final AlertService alertService;
+    private final UserAuthRepository userAuthRepository;
 
-    public LoadBookController(UserAuthRepository userAuthRepository, AlertService alertService, @Value("${bookshelf.book.add}") String bookAdd) {
-        this.userAuthRepository = userAuthRepository;
-        this.alertService = alertService;
+    private File choosedFile;
+    private InputStream file;
+
+    public LoadBookController(@Value("${bookshelf.book.add}") String bookAdd, AlertService alertService, UserAuthRepository userAuthRepository) {
         this.bookAdd = bookAdd;
+        this.alertService = alertService;
+        this.userAuthRepository = userAuthRepository;
     }
 
     @FXML
     void initialize() {
-        loadBookBackButton.setOnAction(
+        backButton.setOnAction(
                 actionEvent -> {
-                    setScene(loadBookBackButton, "Библиотека", MainMenuController.class, fxWeaver);
+                    setScene(backButton, "Библиотека", MainMenuController.class, fxWeaver);
                 });
 
-        loadBookButton.setOnAction(
+        loadingBookButton.setOnAction(
                 actionEvent -> {
+                    FileChooser fileChooser = new FileChooser();
                     FileChooser.ExtensionFilter extFilter =
                             new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
                     fileChooser.getExtensionFilters().add(extFilter);
@@ -78,11 +68,11 @@ public class LoadBookController extends BaseController {
                     choosedFile = fileChooser.showOpenDialog(stage);
                 });
 
-        saveBookButton.setOnAction(
+        savingBookButton.setOnAction(
                 actionEvent -> {
-                    if (tbAuthor.getText().trim().isEmpty()
-                            || tbTitle.getText().trim().isEmpty()
-                            || dpPublishDate.getValue() == null) {
+                    if (authorTf.getText().trim().isEmpty()
+                            || titleTf.getText().trim().isEmpty()
+                            || publishDateDp.getValue() == null) {
                         alertService.showAlert(Alert.AlertType.ERROR, "Пустые поля при загрузке книги", "Вы заполнили не все поля", false);
                     } else {
                         try {
@@ -95,9 +85,9 @@ public class LoadBookController extends BaseController {
                         try {
                             BookDTO bookDTO = BookDTO
                                     .builder()
-                                    .author(tbAuthor.getText())
-                                    .title(tbTitle.getText())
-                                    .publishDate(LocalDate.parse(dpPublishDate.getValue().toString()))
+                                    .author(authorTf.getText())
+                                    .title(titleTf.getText())
+                                    .publishDate(LocalDate.parse(publishDateDp.getValue().toString()))
                                     .owner(userAuthRepository.getUser().getLogin())
                                     .fileData(file.readAllBytes())
                                     .build();
@@ -114,7 +104,7 @@ public class LoadBookController extends BaseController {
                         }
                         Optional<ButtonType> userClickAlert = alertService.showAlert(Alert.AlertType.INFORMATION, "Книга загружена!", "Книга успешно загружена!", true);
                         if (userClickAlert.get() == ButtonType.OK) {
-                            clearFields(tbAuthor, tbTitle, dpPublishDate);
+                            clearFields(authorTf, titleTf, publishDateDp);
                         }
                     }
                 });

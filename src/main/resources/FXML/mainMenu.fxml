@@ -10,20 +10,20 @@
    <children>
       <ImageView fitHeight="720.0" fitWidth="1287.0" layoutX="-2.0">
          <image>
-            <Image url="@../assets/6.jpg" />
+            <Image url="@../assets/mainMenu.jpg" />
          </image>
       </ImageView>
-      <Hyperlink fx:id="loadLinkMenu" layoutX="891.0" layoutY="79.0" prefHeight="74.0" prefWidth="293.0" text="ЗАГРУЗИТЬ КНИГУ">
+      <Hyperlink fx:id="loadingBookLink" layoutX="891.0" layoutY="79.0" prefHeight="74.0" prefWidth="293.0" text="ЗАГРУЗИТЬ КНИГУ">
          <font>
             <Font name="Web Serveroff Regular" size="45.0" />
          </font>
       </Hyperlink>
-      <Hyperlink fx:id="myShelfLinkMenu" layoutX="933.0" layoutY="323.0" prefHeight="74.0" prefWidth="209.0" text="БИБЛИОТЕКА" textAlignment="CENTER">
+      <Hyperlink fx:id="libraryLink" layoutX="933.0" layoutY="323.0" prefHeight="74.0" prefWidth="209.0" text="БИБЛИОТЕКА" textAlignment="CENTER">
          <font>
             <Font name="Web Serveroff Regular" size="45.0" />
          </font>
       </Hyperlink>
-      <Hyperlink fx:id="backLinkMenu" layoutX="979.0" layoutY="574.0" text="НАЗАД">
+      <Hyperlink fx:id="backLink" layoutX="979.0" layoutY="574.0" text="НАЗАД">
          <font>
             <Font name="Web Serveroff Regular" size="45.0" />
          </font>

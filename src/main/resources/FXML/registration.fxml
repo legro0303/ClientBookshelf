@@ -13,20 +13,20 @@
    <children>
       <ImageView fitHeight="720.0" fitWidth="1280.0">
          <image>
-            <Image url="@../assets/3.jpg" />
+            <Image url="@../assets/registration.jpg" />
          </image>
       </ImageView>
-      <TextField fx:id="firstNameReg" layoutX="217.0" layoutY="138.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
-      <TextField fx:id="secondNameReg" layoutX="217.0" layoutY="206.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
-      <TextField fx:id="loginReg" layoutX="217.0" layoutY="274.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
-      <PasswordField fx:id="passReg" layoutX="217.0" layoutY="344.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
-      <TextField fx:id="mailReg" layoutX="217.0" layoutY="412.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
-      <Button fx:id="buttonReg" layoutX="217.0" layoutY="508.0" mnemonicParsing="false" prefHeight="53.0" prefWidth="285.0" stylesheets="@../css/Styles.css" text="Регистрация" textFill="WHITE">
+      <TextField fx:id="firstNameTf" layoutX="217.0" layoutY="138.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
+      <TextField fx:id="secondNameTf" layoutX="217.0" layoutY="206.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
+      <TextField fx:id="loginTf" layoutX="217.0" layoutY="274.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
+      <PasswordField fx:id="passwordPf" layoutX="217.0" layoutY="344.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
+      <TextField fx:id="mailTf" layoutX="217.0" layoutY="412.0" prefHeight="27.0" prefWidth="285.0" stylesheets="@../css/Styles.css" />
+      <Button fx:id="registerUserButton" layoutX="217.0" layoutY="508.0" mnemonicParsing="false" prefHeight="53.0" prefWidth="285.0" stylesheets="@../css/Styles.css" text="Регистрация" textFill="WHITE">
          <font>
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="backToAuthButtonReg" layoutX="217.0" layoutY="595.0" mnemonicParsing="false" prefHeight="53.0" prefWidth="285.0" stylesheets="@../css/Styles.css" text="Назад к авторизации" textFill="WHITE">
+      <Button fx:id="backButton" layoutX="217.0" layoutY="595.0" mnemonicParsing="false" prefHeight="53.0" prefWidth="285.0" stylesheets="@../css/Styles.css" text="Назад к авторизации" textFill="WHITE">
          <font>
             <Font size="24.0" />
          </font>

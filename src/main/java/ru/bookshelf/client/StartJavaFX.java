@@ -1,7 +1,6 @@
 package ru.bookshelf.client;
 
 import javafx.application.Application;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.spring.SpringFxWeaver;
@@ -14,7 +13,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 //This main-class needs to start application using JavaFX dependencies
 @SpringBootApplication
 public class StartJavaFX {
-
     public static void main(String[] args) {
         Application.launch(ClientApplication.class, args);
     }
@@ -35,5 +33,4 @@ public class StartJavaFX {
     public WebClient createWebClient() {
         return WebClient.create();
     }
-
 }

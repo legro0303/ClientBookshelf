@@ -16,32 +16,34 @@ import ru.bookshelf.client.service.repository.UserAuthRepository;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @FxmlView("/FXML/mainMenu.fxml")
 public class MainMenuController extends BaseController {
-    @Autowired
-    private FxWeaver fxWeaver;
+    @Autowired private FxWeaver fxWeaver;
 
-    private UserAuthRepository userAuthRepository;
+    @FXML private Hyperlink backLink;
+    @FXML private Hyperlink libraryLink;
+    @FXML private Hyperlink loadingBookLink;
 
-    @FXML private Hyperlink loadLinkMenu;
-    @FXML private Hyperlink myShelfLinkMenu;
-    @FXML private Hyperlink backLinkMenu;
+    private final UserAuthRepository userAuthRepository;
+
+    public MainMenuController(UserAuthRepository userAuthRepository) {
+        this.userAuthRepository = userAuthRepository;
+    }
 
     @FXML
     void initialize() {
-
-        loadLinkMenu.setOnAction(
+        loadingBookLink.setOnAction(
                 actionEvent -> {
-                    setScene(loadLinkMenu, "Загрузка книг", LoadBookController.class, fxWeaver);
+                    setScene(loadingBookLink, "Загрузка книг", LoadBookController.class, fxWeaver);
                 });
 
-        myShelfLinkMenu.setOnAction(
+        libraryLink.setOnAction(
                 actionEvent -> {
-                    setScene(myShelfLinkMenu, "Библиотека книг", MyShelfController.class, fxWeaver);
+                    setScene(libraryLink, "Библиотека книг", LibraryController.class, fxWeaver);
                 });
 
-        backLinkMenu.setOnAction(
+        backLink.setOnAction(
                 actionEvent -> {
                     userAuthRepository.deleteUser();
-                    setScene(myShelfLinkMenu, "Авторизация", AuthController.class, fxWeaver);
+                    setScene(libraryLink, "Авторизация", AuthController.class, fxWeaver);
                 });
     }
 }

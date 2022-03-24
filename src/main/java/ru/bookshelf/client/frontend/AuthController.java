@@ -21,45 +21,37 @@ import ru.bookshelf.client.service.repository.UserAuthRepository;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @FxmlView("/FXML/authorization.fxml")
 public class AuthController extends BaseController {
-    @Autowired
-    private FxWeaver fxWeaver;
+    @Autowired private FxWeaver fxWeaver;
+    @Autowired private WebClient webClient;
 
-    @Autowired
-    private WebClient webClient;
+    @FXML private Button authButton;
+    @FXML private TextField loginTf;
+    @FXML private PasswordField passwordPf;
+    @FXML private Hyperlink registrationLink;
 
+    private final String authUser;
     private final AlertService alertService;
     private final UserAuthRepository userAuthRepository;
 
-    @FXML
-    private PasswordField passAuth;
-    @FXML
-    private TextField loginAuth;
-    @FXML
-    private Button buttonAuth;
-    @FXML
-    private Hyperlink linkAuth;
-
-    private final String authUser;
-
-    public AuthController(AlertService alertService, UserAuthRepository userAuthRepository, @Value("${bookshelf.user.authorization}") String authUser) {
+    public AuthController(@Value("${bookshelf.user.authorization}") String authUser, AlertService alertService, UserAuthRepository userAuthRepository) {
+        this.authUser = authUser;
         this.alertService = alertService;
         this.userAuthRepository = userAuthRepository;
-        this.authUser = authUser;
     }
 
     @FXML
     void initialize() {
-        linkAuth.setOnAction(
+        registrationLink.setOnAction(
                 actionEvent -> {
-                    setScene(linkAuth, "Регистрация", RegController.class, fxWeaver);
+                    setScene(registrationLink, "Регистрация", RegController.class, fxWeaver);
                 });
 
-        buttonAuth.setOnAction(
+        authButton.setOnAction(
                 actionEvent -> {
                     UserAuthDTO userAuthDTO = UserAuthDTO
                             .builder()
-                            .login(loginAuth.getText())
-                            .password(passAuth.getText())
+                            .login(loginTf.getText())
+                            .password(passwordPf.getText())
                             .build();
                     userAuthRepository.addUser(userAuthDTO);
 
@@ -69,14 +61,14 @@ public class AuthController extends BaseController {
                             .bodyValue(userAuthDTO)
                             .retrieve()
                             .bodyToMono(Boolean.class)
-                            .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для авторизации пользователя - [{}]" , exception.getMessage()))
+                            .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для авторизации пользователя - [{}]", exception.getMessage()))
                             .block();
                     if (result == true) {
-                        setScene(buttonAuth, "Главное меню", MainMenuController.class, fxWeaver);
+                        setScene(authButton, "Главное меню", MainMenuController.class, fxWeaver);
                     } else {
                         alertService.showAlert(Alert.AlertType.ERROR, "Ошибка авторизации",
                                 "Вы ввели неверный логин или пароль, пожалуйста, попробуйте ввести данные ещё раз.", false);
-                        clearFields(loginAuth, passAuth);
+                        clearFields(loginTf, passwordPf);
                     }
                 });
     }
