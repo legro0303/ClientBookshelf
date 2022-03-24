@@ -1,5 +1,7 @@
 package ru.bookshelf.client.service.dto;
 
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.StringProperty;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -11,6 +13,7 @@ import java.time.LocalDate;
 @ToString
 @Builder(toBuilder = true)
 public class BookDTO {
+    long id;
     String author;
     String title;
     LocalDate publishDate;

@@ -1,9 +1,7 @@
 package ru.bookshelf.client.frontend;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import com.dansoftware.pdfdisplayer.PDFDisplayer;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -14,12 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import ru.bookshelf.client.service.AlertService;
 import ru.bookshelf.client.service.FileUploadService;
 import ru.bookshelf.client.service.dto.BookDTO;
+import ru.bookshelf.client.service.repository.UserAuthRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -30,54 +33,69 @@ public class MyShelfController extends BaseController {
     @Autowired
     private FxWeaver fxWeaver;
 
-    @FXML private Button myShelfBackButton;
-    @FXML private TableView<BookDTO> libTable;
-    @FXML private TableColumn<BookDTO, String> author;
-    @FXML private TableColumn<BookDTO, String> title;
-    @FXML private TableColumn<BookDTO, String> publishDate;
-    @FXML private TableColumn<BookDTO, byte[]> fileData;
-    @FXML private ScrollBar dataScroll;
+    @Autowired
+    private WebClient webClient;
+
+    private final AlertService alertService;
+    private final FileUploadService fileUploadService;
+    private final UserAuthRepository userAuthRepository;
+
+    @FXML
+    private Button myShelfBackButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private TableView<BookDTO> libTable;
+    @FXML
+    private TableColumn<BookDTO, Long> id;
+    @FXML
+    private TableColumn<BookDTO, String> author;
+    @FXML
+    private TableColumn<BookDTO, String> title;
+    @FXML
+    private TableColumn<BookDTO, String> publishDate;
+    @FXML
+    private ScrollBar dataScroll;
 
     private String path = new String();
 
     private final String bookGet;
+    private final String bookGetBytes;
+    private final String bookDelete;
 
-    public MyShelfController( @Value("${bookshelf.book.get}") String bookGet) {
+
+    public MyShelfController(AlertService alertService,
+                             FileUploadService fileUploadService, UserAuthRepository userAuthRepository,
+                             @Value("${bookshelf.book.get}") String bookGet,
+                             @Value("${bookshelf.book.get-book-bytes}") String bookGetBytes,
+                             @Value("${bookshelf.book.delete}") String bookDelete) {
+        this.alertService = alertService;
+        this.fileUploadService = fileUploadService;
+        this.userAuthRepository = userAuthRepository;
         this.bookGet = bookGet;
+        this.bookGetBytes = bookGetBytes;
+        this.bookDelete = bookDelete;
     }
 
     @FXML
     void initialize() {
-        String nodeOfBooks = new String();
+        List<BookDTO> booksList = webClient.get()
+                .uri(bookGet)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<BookDTO>>() {
+                })
+                .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для получения всех книг - [{}]", exception.getMessage()))
+                .block();
 
-        try {//TODO переделать запрос и добавить обработку ошибки
-            nodeOfBooks =
-                    Unirest.get(bookGet)
-                            .header("accept", "application/json")
-                            .asString()
-                            .getBody();
-
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-        ObjectMapper mapper = new ObjectMapper();
-
-        List<BookDTO> booksFromJson = new ArrayList<>();
-
-        try {
-            booksFromJson = Arrays.asList(mapper.readValue(nodeOfBooks, BookDTO[].class));
-        } catch (JsonProcessingException e) {
-            log.error("Невозможно считать книгу - [{}] ", e);
-        }
-
+        id.setCellValueFactory(new PropertyValueFactory<BookDTO, Long>("id"));
         author.setCellValueFactory(new PropertyValueFactory<BookDTO, String>("author"));
         title.setCellValueFactory(new PropertyValueFactory<BookDTO, String>("title"));
         publishDate.setCellValueFactory(new PropertyValueFactory<BookDTO, String>("publishDate"));
-        fileData.setCellValueFactory(new PropertyValueFactory<BookDTO, byte[]>("fileData"));
-        libTable.getItems().addAll(booksFromJson);
+
+        libTable.getItems().addAll(booksList);
 
 
-        FileUploadService fileUploadService = new FileUploadService();
+        log.info("libtable имеет [{}]", libTable.getItems());
 
         libTable.setRowFactory(
                 tv -> {
@@ -85,10 +103,22 @@ public class MyShelfController extends BaseController {
                     row.setOnMouseClicked(
                             event -> {
                                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                                    BookDTO rowData = row.getItem();
-                                    byte[] fileFromDB = rowData.getFileData();
-                                    path = fileUploadService.convertToFile(fileFromDB);
-
+                                    byte[] qwe = webClient.get()
+                                            .uri(bookGetBytes + row.getItem().getId())
+                                            .retrieve()
+                                            .bodyToMono(byte[].class)
+                                            .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для получения всех книг - [{}]", exception.getMessage()))
+                                            .block();
+                                    path = fileUploadService.convertToFile(qwe);
+                                    PDFDisplayer displayer = new PDFDisplayer();
+                                    File file = new File(path);
+                                    try {
+                                        displayer.loadPDF(file);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    setScene("Библиотека123", displayer, fxWeaver);
+                                    file.delete();
                                 }
                             });
                     return row;
@@ -96,8 +126,30 @@ public class MyShelfController extends BaseController {
 
         myShelfBackButton.setOnAction(
                 actionEvent -> {
-                        setScene(myShelfBackButton,"Главное меню", MainMenuController.class, fxWeaver);
+                    setScene(myShelfBackButton, "Главное меню", MainMenuController.class, fxWeaver);
                     // books = (Long) countOfBooksResult.getObject().get("count");
                 });
+    }
+
+    @FXML
+    void deleteRowAction(ActionEvent event) {
+        BookDTO bookDTO = libTable.getSelectionModel().getSelectedItem();
+        bookDTO.setOwner(userAuthRepository.getUser().getLogin());
+
+        Boolean bookWasDeleted = webClient.post()
+                .uri(bookDelete)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(bookDTO)
+                .retrieve()
+                .bodyToMono(Boolean.class)
+                .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для удаления книги - [{}]", exception.getMessage()))
+                .block();
+
+        if (bookWasDeleted == true) {
+            libTable.getItems().removeAll(bookDTO);
+        } else if (bookWasDeleted == false) {
+            alertService.showAlert(Alert.AlertType.ERROR, "Ошибка удаления книги",
+                    "Вы не можете удалить данную книгу, так как не являетесь её владельцем", false);
+        }
     }
 }

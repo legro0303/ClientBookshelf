@@ -26,14 +26,19 @@
          <children>
             <TableView fx:id="libTable" prefHeight="446.0" prefWidth="1159.0">
                <columns>
+                  <TableColumn fx:id="id" prefWidth="57.0" text="Id" />
                   <TableColumn fx:id="author" prefWidth="231.0" text="Автор" />
                   <TableColumn fx:id="title" minWidth="0.0" prefWidth="442.0" text="Название" />
-                  <TableColumn fx:id="publishDate" minWidth="0.0" prefWidth="172.0" text="Дата публикации" />
-                  <TableColumn fx:id="fileData" prefWidth="227.0" text="Книга" />
+                  <TableColumn fx:id="publishDate" minWidth="0.0" prefWidth="343.0" text="Дата публикации" />
                </columns>
             </TableView>
-            <ScrollBar fx:id="dataScroll" orientation="VERTICAL" StackPane.alignment="TOP_RIGHT" />
+            <ScrollBar fx:id="dataScroll" orientation="VERTICAL" prefHeight="386.0" prefWidth="14.0" StackPane.alignment="TOP_RIGHT" />
          </children>
       </StackPane>
+      <Button fx:id="deleteButton" layoutX="1089.0" layoutY="623.0" mnemonicParsing="false" onAction="#deleteRowAction" prefHeight="65.0" prefWidth="80.0" stylesheets="@../css/Styles.css" text="Удалить" textFill="WHITE">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

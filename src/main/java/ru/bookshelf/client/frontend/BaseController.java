@@ -1,5 +1,6 @@
 package ru.bookshelf.client.frontend;
 
+import com.dansoftware.pdfdisplayer.PDFDisplayer;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -33,6 +34,19 @@ public abstract class BaseController {
         try {
             link.getScene().getWindow().hide();
             Parent root = (Parent) fxWeaver.loadView(controller);
+            stage.setTitle(title);
+            stage.setResizable(false);
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            log.error("Непредвиденная ошибка при загрузке сцены " + e);
+        }
+
+    }
+
+    public void setScene(String title, PDFDisplayer displayer, FxWeaver fxWeaver) {
+        try {
+            Parent root = displayer.toNode();
             stage.setTitle(title);
             stage.setResizable(false);
             stage.setScene(new Scene(root));

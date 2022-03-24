@@ -6,6 +6,7 @@ bookshelf:
   book:
     add: ${add-book}
     get: ${get-book}
+    get-book-bytes: ${get-book-bytes}
     delete: ${delete-book}
   user:
     registration: ${reg-user}
