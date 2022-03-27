@@ -2,13 +2,38 @@ client:
   port: ${app.port}
   forward-headers-strategy: framework
 
-bookshelf:
+spring:
+  mail:
+    default-encoding: UTF-8
+    host: ${mail.host}
+    username: ${mail.username}
+    password: ${mail.password}
+    port: ${mail.port}
+    protocol: smtp
+    tls: false
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+libraryserv:
   book:
     add: ${add-book}
     get: ${get-book}
-    get-book-bytes: ${get-book-bytes}
+    get-bytes: ${get-bytes}
     delete: ${delete-book}
   user:
     registration: ${reg-user}
     validation: ${valid-user}
     authorization: ${auth-user}
+  server:
+    health-check: ${health-check}
+  file-storage:
+    upload-dir: ${upload-dir}
+  email:
+    to: ${email.recipient-address}
+    from: ${email.sender-address}
+    subject: ${email.message.subject}
+    template: ${email.message.template}

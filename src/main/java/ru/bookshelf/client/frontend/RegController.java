@@ -38,7 +38,9 @@ public class RegController extends BaseController {
     private final String userValid;
     private final AlertService alertService;
 
-    public RegController(@Value("${bookshelf.user.registration}") String userReg, @Value("${bookshelf.user.validation}") String userValid, AlertService alertService) {
+    public RegController(@Value("${libraryserv.user.registration}") String userReg,
+                         @Value("${libraryserv.user.validation}") String userValid,
+                         AlertService alertService) {
         this.userReg = userReg;
         this.userValid = userValid;
         this.alertService = alertService;
@@ -97,7 +99,7 @@ public class RegController extends BaseController {
                             if (userClickAlert.get() == ButtonType.OK) {
                                 setScene(backButton, "Авторизация", AuthController.class, fxWeaver);
                             }
-                        } else if (notRegisteredYet == false) {
+                        } else {
                             alertService.showAlert(Alert.AlertType.ERROR, "Пользователь уже зарегистрирован", "Логин, введённый вами уже используются. Пожалуйста, введите другие данные.", false);
                             clearFields(firstNameTf, secondNameTf, loginTf, passwordPf, mailTf);
                         }

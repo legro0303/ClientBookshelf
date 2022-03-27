@@ -33,7 +33,8 @@ public class AuthController extends BaseController {
     private final AlertService alertService;
     private final UserAuthRepository userAuthRepository;
 
-    public AuthController(@Value("${bookshelf.user.authorization}") String authUser, AlertService alertService, UserAuthRepository userAuthRepository) {
+    public AuthController(@Value("${libraryserv.user.authorization}") String authUser,
+                          AlertService alertService, UserAuthRepository userAuthRepository) {
         this.authUser = authUser;
         this.alertService = alertService;
         this.userAuthRepository = userAuthRepository;

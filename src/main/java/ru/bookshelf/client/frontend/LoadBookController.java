@@ -45,7 +45,7 @@ public class LoadBookController extends BaseController {
     private File choosedFile;
     private InputStream file;
 
-    public LoadBookController(@Value("${bookshelf.book.add}") String bookAdd, AlertService alertService, UserAuthRepository userAuthRepository) {
+    public LoadBookController(@Value("${libraryserv.book.add}") String bookAdd, AlertService alertService, UserAuthRepository userAuthRepository) {
         this.bookAdd = bookAdd;
         this.alertService = alertService;
         this.userAuthRepository = userAuthRepository;

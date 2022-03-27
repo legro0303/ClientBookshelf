@@ -33,7 +33,7 @@ Configutation:
         - ref: Console_Appender
         - ref: RollingFile_Appender
     Logger:
-      name: ru.iconsoft.signserv
+      name: ru.bookshelf.client
       additivity: false
       level: debug
       AppenderRef:

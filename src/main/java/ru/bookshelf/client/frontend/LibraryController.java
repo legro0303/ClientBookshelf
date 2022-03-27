@@ -2,8 +2,11 @@ package ru.bookshelf.client.frontend;
 
 import com.dansoftware.pdfdisplayer.PDFDisplayer;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -22,6 +25,8 @@ import ru.bookshelf.client.service.repository.UserAuthRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
@@ -31,6 +36,7 @@ import java.util.List;
 public class LibraryController extends BaseController {
     @Autowired private FxWeaver fxWeaver;
     @Autowired private WebClient webClient;
+    @Autowired private PDFDisplayer displayer;
 
     @FXML private ScrollBar dataScroll;
     @FXML private Button backButton;
@@ -50,9 +56,9 @@ public class LibraryController extends BaseController {
 
     public LibraryController(AlertService alertService,
                              FileUploadService fileUploadService, UserAuthRepository userAuthRepository,
-                             @Value("${bookshelf.book.get}") String bookGet,
-                             @Value("${bookshelf.book.get-book-bytes}") String bookGetBytes,
-                             @Value("${bookshelf.book.delete}") String bookDelete) {
+                             @Value("${libraryserv.book.get}") String bookGet,
+                             @Value("${libraryserv.book.get-bytes}") String bookGetBytes,
+                             @Value("${libraryserv.book.delete}") String bookDelete) {
         this.alertService = alertService;
         this.fileUploadService = fileUploadService;
         this.userAuthRepository = userAuthRepository;
@@ -81,27 +87,31 @@ public class LibraryController extends BaseController {
         log.info("libtable имеет [{}]", libTable.getItems());
 
         libTable.setRowFactory(
-                tv -> {
+                tableView -> {
                     TableRow<BookDTO> row = new TableRow<>();
                     row.setOnMouseClicked(
                             event -> {
                                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                                    byte[] qwe = webClient.get()
+                                    byte[] bytesOfBook = webClient.get()
                                             .uri(bookGetBytes + row.getItem().getId())
                                             .retrieve()
                                             .bodyToMono(byte[].class)
                                             .doOnError(exception -> log.error("Ошибка при попытке отправить запрос серверу для получения всех книг - [{}]", exception.getMessage()))
                                             .block();
-                                    String path = fileUploadService.convertToFile(qwe);
-                                    PDFDisplayer displayer = new PDFDisplayer();
-                                    File file = new File(path);
                                     try {
-                                        displayer.loadPDF(file);
+                                        //TODO доделать
+                                        Stage stage = new Stage();
+                                        displayer.loadPDF(fileUploadService.convertToFile(bytesOfBook));
+                                        Parent root = displayer.toNode();
+                                        Scene scene = new Scene(root);
+                                        stage.setTitle("23423");
+                                        stage.setResizable(false);
+                                        stage.setScene(scene);
+                                        stage.show();
+                                        //setScene("Библиотека123", displayer, fxWeaver);
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
-                                    setScene("Библиотека123", displayer, fxWeaver);
-                                    file.delete();
                                 }
                             });
                     return row;

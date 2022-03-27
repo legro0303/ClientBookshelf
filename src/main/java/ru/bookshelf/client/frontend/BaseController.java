@@ -4,15 +4,18 @@ import com.dansoftware.pdfdisplayer.PDFDisplayer;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 public abstract class BaseController {
     @Autowired private Stage stage;
 
+//TODO заменить всё логирование на английский язык
     public void setScene(Button button, String title, Class controller, FxWeaver fxWeaver) {
         log.info("Загрузка сцены " + controller.getSimpleName());
         try {
@@ -44,9 +47,14 @@ public abstract class BaseController {
     public void setScene(String title, PDFDisplayer displayer, FxWeaver fxWeaver) {
         try {
             Parent root = displayer.toNode();
+//            Parent root = displayer.toNode();
             stage.setTitle(title);
             stage.setResizable(false);
             stage.setScene(new Scene(root));
+            stage.show();
+            stage.setTitle(title);
+            stage.setResizable(false);
+            stage.setScene(new Scene((Parent) fxWeaver.loadView(LibraryController.class)));
             stage.show();
         } catch (Exception e) {
             log.error("Непредвиденная ошибка при загрузке сцены " + e);
