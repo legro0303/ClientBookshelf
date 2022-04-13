@@ -35,5 +35,7 @@ libraryserv:
   email:
     to: ${email.recipient-address}
     from: ${email.sender-address}
-    subject: ${email.message.subject}
-    template: ${email.message.template}
+    subject-server-unavailable: ${email.message.subject-server-unavailable}
+    subject-cannot-delete-book: ${email.message.subject-cannot-delete-book}
+    template-server-unavailable: ${email.message.template-server-unavailable}
+    template-cannot-delete-book: ${email.message.template-cannot-delete-book}

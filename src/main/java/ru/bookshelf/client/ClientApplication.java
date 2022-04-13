@@ -31,7 +31,7 @@ public class ClientApplication extends Application {
         Parent root = fxWeaver.loadView(StartController.class);
         Scene scene = new Scene(root, 1280, 720);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Стартовое меню");
+        primaryStage.setTitle("Start menu");
         primaryStage.show();
     }
 

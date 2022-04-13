@@ -32,18 +32,18 @@ public class MainMenuController extends BaseController {
     void initialize() {
         loadingBookLink.setOnAction(
                 actionEvent -> {
-                    setScene(loadingBookLink, "Загрузка книг", LoadBookController.class, fxWeaver);
+                    setScene(loadingBookLink, "Upload books", LoadBookController.class, fxWeaver);
                 });
 
         libraryLink.setOnAction(
                 actionEvent -> {
-                    setScene(libraryLink, "Библиотека книг", LibraryController.class, fxWeaver);
+                    setScene(libraryLink, "Library", LibraryController.class, fxWeaver);
                 });
 
         backLink.setOnAction(
                 actionEvent -> {
                     userAuthRepository.deleteUser();
-                    setScene(libraryLink, "Авторизация", AuthController.class, fxWeaver);
+                    setScene(backLink, "Authorization", AuthController.class, fxWeaver);
                 });
     }
 }

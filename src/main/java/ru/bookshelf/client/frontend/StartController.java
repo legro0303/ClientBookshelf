@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
+import reactor.core.publisher.Mono;
 import ru.bookshelf.client.config.AppConfiguration;
 import ru.bookshelf.client.service.AlertService;
 import ru.bookshelf.client.service.MailService;
@@ -58,38 +59,36 @@ public class StartController extends BaseController {
     void initialize() {
         startButton.setOnAction(
                 actionEvent -> {
-                    //TODO разобраться с хендлингом исключений внутри веб клиента
-                    try {
                         webClient.post()
                                 .uri(healthCheckURL)
                                 .retrieve()
                                 .bodyToMono(Void.class)
                                 .doOnSuccess(response -> {
-                                    log.info("Сервер доступен!");
+                                    log.info("Server is available!");
                                     Platform.runLater(new Runnable() {
                                         public void run() {
-                                            setScene(startButton, "Авторизация", AuthController.class, fxWeaver);
+                                            setScene(startButton, "Authorization", AuthController.class, fxWeaver);
                                         }
                                     });
                                 })
-                                .onErrorMap(exception -> {
+                                .onErrorResume(WebClientRequestException.class, throwable -> {
                                     try {
-                                        mailService.sendEmail(emailConfig, exception);
-                                    } catch (MessagingException e) {
-                                        log.error("Возникла ошибка при попытке отправить уведомление администратору [{}]", e);
+                                        mailService.sendEmail(emailConfig, throwable);
+                                    } catch (MessagingException messagingException) {
+                                        log.error("An error occurred while trying to send a notification to the administrator [{}]", messagingException);
                                     }
-                                    log.error("Сервер не доступен [{}]", exception.getMessage());
                                     Platform.runLater(new Runnable() {
                                         public void run() {
-                                            alertService.showAlert(Alert.AlertType.ERROR, "Сервер не работает", "В данный момент сервер не функционирует", false);
+                                            alertService.showAlert(Alert.AlertType.ERROR,
+                                                    "Server unavailable",
+                                                    "An unexpected error has occurred, the administrator has been notified and will try to fix it as soon as possible",
+                                                    false);
                                         }
                                     });
-                                    return exception;
+                                    log.error("Unable to connect to server [{}]", throwable.getMessage());
+                                    return Mono.empty();
                                 })
                                 .block();
-                    } catch (WebClientRequestException ex) {
-                        log.error("Невозможно установить соединение с сервером [{}]", ex.getMessage());
-                    }
                 });
     }
 }

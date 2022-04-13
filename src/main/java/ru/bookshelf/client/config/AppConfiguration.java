@@ -29,7 +29,9 @@ public class AppConfiguration {
     public static class EmailConfig {
         private String to;
         private String from;
-        private String subject;
-        private String template;
+        private String subjectServerUnavailable;
+        private String subjectCannotDeleteBook;
+        private String templateServerUnavailable;
+        private String templateCannotDeleteBook;
     }
 }

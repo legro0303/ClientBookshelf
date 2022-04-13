@@ -3,7 +3,6 @@ package ru.bookshelf.client.service;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -25,18 +24,35 @@ public class MailService {
 
     @Async
     public void sendEmail(AppConfiguration.EmailConfig email, Throwable exception) throws MessagingException {
-        log.debug("Send email to '{}' from '{}' with subject '{}'", email.getTo(), email.getFrom(), email.getSubject());
+        log.debug("Sending email to '{}' from '{}' with subject '{}'", email.getTo(), email.getFrom(), email.getSubjectServerUnavailable());
         Context context = new Context();
         context.setVariable("error", exception.getMessage());
 
-        String process = templateEngine.process(email.getTemplate(), context);
+        String process = templateEngine.process(email.getTemplateServerUnavailable(), context);
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
         helper.setTo(email.getTo());
         helper.setFrom(email.getFrom());
-        helper.setSubject(email.getSubject());
+        helper.setSubject(email.getSubjectServerUnavailable());
         helper.setText(process, true);
         javaMailSender.send(mimeMessage);
-        log.info("Email was send successfully");
+        log.info("Email was sent successfully");
+    }
+    @Async
+    public void sendEmail(AppConfiguration.EmailConfig email, String errors, Long id) throws MessagingException {
+        log.debug("Sending email to '{}' from '{}' with subject '{}'", email.getTo(), email.getFrom(), email.getSubjectCannotDeleteBook());
+        Context context = new Context();
+        context.setVariable("error", errors);
+        context.setVariable("id", id.toString());
+
+        String process = templateEngine.process(email.getTemplateCannotDeleteBook(), context);
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+        helper.setTo(email.getTo());
+        helper.setFrom(email.getFrom());
+        helper.setSubject(email.getSubjectCannotDeleteBook());
+        helper.setText(process, true);
+        javaMailSender.send(mimeMessage);
+        log.info("Email was sent successfully");
     }
 }

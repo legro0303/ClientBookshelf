@@ -4,20 +4,17 @@ import com.dansoftware.pdfdisplayer.PDFDisplayer;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 public abstract class BaseController {
     @Autowired private Stage stage;
 
-//TODO заменить всё логирование на английский язык
     public void setScene(Button button, String title, Class controller, FxWeaver fxWeaver) {
-        log.info("Загрузка сцены " + controller.getSimpleName());
+        log.info("Upload scene [{}]", controller.getSimpleName());
         try {
             button.getScene().getWindow().hide();
             Parent root = (Parent) fxWeaver.loadView(controller);
@@ -26,12 +23,12 @@ public abstract class BaseController {
             stage.setResizable(false);
             stage.show();
         } catch (Exception e) {
-            log.error("Непредвиденная ошибка при загрузке сцены " + e);
+            log.error("Unexpected error while uploading scene " + e);
         }
     }
 
     public void setScene(Hyperlink link, String title, Class controller, FxWeaver fxWeaver) {
-        log.info("Загрузка сцены " + controller.getSimpleName());
+        log.info("Upload scene [{}]", controller.getSimpleName());
         try {
             link.getScene().getWindow().hide();
             Parent root = (Parent) fxWeaver.loadView(controller);
@@ -40,24 +37,34 @@ public abstract class BaseController {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (Exception e) {
-            log.error("Непредвиденная ошибка при загрузке сцены " + e);
+            log.error("Unexpected error while uploading scene " + e);
         }
     }
 
-    public void setScene(String title, PDFDisplayer displayer, FxWeaver fxWeaver) {
+    public void setScene(String title, Class controller, FxWeaver fxWeaver) {
+        log.info("Upload scene [{}]", controller.getSimpleName());
         try {
-            Parent root = displayer.toNode();
-//            Parent root = displayer.toNode();
+            Parent root = (Parent) fxWeaver.loadView(controller);
             stage.setTitle(title);
             stage.setResizable(false);
             stage.setScene(new Scene(root));
             stage.show();
+        } catch (Exception e) {
+            log.error("Unexpected error while uploading scene " + e);
+        }
+    }
+
+    public void setScene(String title, PDFDisplayer displayer) {
+        log.info("Upload scene [{}]", title);
+        try {
+            Stage stage = new Stage();
+            Parent root = displayer.toNode();
             stage.setTitle(title);
             stage.setResizable(false);
-            stage.setScene(new Scene((Parent) fxWeaver.loadView(LibraryController.class)));
+            stage.setScene(new Scene(root));
             stage.show();
         } catch (Exception e) {
-            log.error("Непредвиденная ошибка при загрузке сцены " + e);
+            log.error("Unexpected error while uploading scene " + e);
         }
     }
 

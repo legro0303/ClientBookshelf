@@ -13,7 +13,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AlertService {
     public Optional<ButtonType> showAlert(Alert.AlertType type, String title, String content, boolean NeedToReturnResult) {
-        log.info("Показываем алерт = [{}]", title);
+        log.info("Show alert = [{}]", title);
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setContentText(content);

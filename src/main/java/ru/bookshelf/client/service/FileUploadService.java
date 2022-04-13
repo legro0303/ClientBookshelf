@@ -30,8 +30,8 @@ public class FileUploadService {
             } catch (SecurityException e) {
                 log.error("Can't create output catalog because has not permission");
                 alertService.showAlert(Alert.AlertType.ERROR,
-                        "Нет доступа",
-                        "Приложение запущено не от имени администратора, нет прав на создание файла-книги",
+                        "No access",
+                        "The application is not running as an administrator, there are no rights to create a book file",
                         false);
             }
         }
