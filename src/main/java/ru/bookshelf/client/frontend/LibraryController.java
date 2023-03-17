@@ -1,6 +1,5 @@
 package ru.bookshelf.client.frontend;
 
-import com.dansoftware.pdfdisplayer.PDFDisplayer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -30,7 +29,6 @@ import ru.bookshelf.client.service.repository.UserAuthRepository;
 
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
-import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -66,25 +64,25 @@ public class LibraryController extends BaseController {
     private final AlertService alertService;
     private final FileUploadService fileUploadService;
     private final UserAuthRepository userAuthRepository;
-    private final String bookGet;
-    private final String bookGetBytes;
-    private final String bookDelete;
+    private final String GET_BOOK;
+    private final String GET_BOOK_BYTES;
+    private final String DELETE_BOOK;
     private final AppConfiguration appConfiguration;
     private AppConfiguration.EmailConfig emailConfig;
 
     public LibraryController(MailService mailService, AlertService alertService,
                              FileUploadService fileUploadService, UserAuthRepository userAuthRepository,
-                             @Value("${libraryserv.book.get}") String bookGet,
-                             @Value("${libraryserv.book.get-bytes}") String bookGetBytes,
-                             @Value("${libraryserv.book.delete}") String bookDelete,
+                             @Value("${libraryserv.book.get}") String getBook,
+                             @Value("${libraryserv.book.get-bytes}") String getBookBytes,
+                             @Value("${libraryserv.book.delete}") String deleteBook,
                              AppConfiguration appConfiguration) {
         this.mailService = mailService;
         this.alertService = alertService;
         this.fileUploadService = fileUploadService;
         this.userAuthRepository = userAuthRepository;
-        this.bookGet = bookGet;
-        this.bookGetBytes = bookGetBytes;
-        this.bookDelete = bookDelete;
+        this.GET_BOOK = getBook;
+        this.GET_BOOK_BYTES = getBookBytes;
+        this.DELETE_BOOK = deleteBook;
         this.appConfiguration = appConfiguration;
     }
     @PostConstruct
@@ -95,24 +93,30 @@ public class LibraryController extends BaseController {
     @FXML
     void initialize() {
         List<BookDTO> booksList = webClient.get()
-                .uri(bookGet)
+                .uri(GET_BOOK)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<BookDTO>>() {
-                })
+                .bodyToMono(new ParameterizedTypeReference<List<BookDTO>>() {})
                 .doOnError(exception -> log.error("Error when trying to send a request to the server to get all books [{}]", exception.getMessage()))
-                .onErrorResume(WebClientRequestException.class, exception -> {
-                    Platform.runLater(new Runnable() {
-                        public void run() {
+                .onErrorResume(WebClientRequestException.class, exception ->
+                {
+                    Platform.runLater(new Runnable()
+                    {
+                        public void run()
+                        {
                             Optional<ButtonType> userClickAlert = alertService.showAlert(
                                     Alert.AlertType.ERROR,
                                     "Book deletion error",
                                     "Connection to server was lost, press OK button for return to start menu",
                                     true);
-                            try {
-                                if ((userClickAlert.get() == ButtonType.OK)) {
+                            try
+                            {
+                                if ((userClickAlert.get() == ButtonType.OK))
+                                {
                                     setScene("Start menu", StartController.class, fxWeaver);
                                 }
-                            }catch (NoSuchElementException e){
+                            }
+                            catch (NoSuchElementException e)
+                            {
                                 setScene("Start menu", StartController.class, fxWeaver);
                             }
                         }
@@ -129,59 +133,64 @@ public class LibraryController extends BaseController {
         libTable.getItems().addAll(booksList);
 
         libTable.setRowFactory(
-                tableView -> {
+                tableView ->
+                {
                     TableRow<BookDTO> row = new TableRow<>();
                     row.setOnMouseClicked(
-                            event -> {
-                                if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                                    byte[] bytesOfBook = webClient.get()
-                                            .uri(bookGetBytes + row.getItem().getId())
-                                            .retrieve()
-                                            .bodyToMono(byte[].class)
-                                            .doOnSuccess(response -> {
-
-                                                //TODO придумать как обрабатывать bytesOfBook внутри doOnSuccess
-                                                try {
-                                                    PDFDisplayer displayer = new PDFDisplayer();
-                                                    displayer.loadPDF(fileUploadService.convertToFile(bytesOfBook));
-                                                    setScene("Book", displayer);
-                                                } catch (IOException e) {
-                                                    log.error("Error when trying to load PDF to WebView {}", e.getMessage());
-                                                }
-                                            })
-                                            .doOnError(exception -> log.error("Error when trying to send a request to the server to get the specified book [{}]", exception.getMessage()))
-                                            .onErrorResume(WebClientRequestException.class, exception -> {
-                                                Platform.runLater(new Runnable() {
-                                                    public void run() {
-                                                        Optional<ButtonType> userClickAlert = alertService.showAlert(
-                                                                Alert.AlertType.ERROR,
-                                                                "Book deletion error",
-                                                                "Connection to server was lost, press OK button for return to start menu",
-                                                                true);
-                                                        try {
-                                                            if ((userClickAlert.get() == ButtonType.OK)) {
-                                                                setScene("Start menu", StartController.class, fxWeaver);
-                                                            }
-                                                        }catch (NoSuchElementException e){
-                                                            setScene("Start menu", StartController.class, fxWeaver);
-                                                        }
-                                                    }
-                                                });
-                                                return Mono.empty();
-                                            })
-                                            .block();
+                            event ->
+                            {
+                                if (event.getClickCount() == 2 && (!row.isEmpty()))
+                                {
+//                                    byte[] bytesOfBook = webClient.get()
+//                                            .uri(bookGetBytes + row.getItem().getId())
+//                                            .retrieve()
+//                                            .bodyToMono(byte[].class)
+//                                            .doOnSuccess(response -> {
+//
+//                                                //TODO придумать как обрабатывать bytesOfBook внутри doOnSuccess
+//                                                try {
+//                                                    PDFDisplayer displayer = new PDFDisplayer();
+//                                                    displayer.loadPDF(fileUploadService.convertToFile(bytesOfBook));
+//                                                    setScene("Book", displayer);
+//                                                } catch (IOException e) {
+//                                                    log.error("Error when trying to load PDF to WebView {}", e.getMessage());
+//                                                }
+//                                            })
+//                                            .doOnError(exception -> log.error("Error when trying to send a request to the server to get the specified book [{}]", exception.getMessage()))
+//                                            .onErrorResume(WebClientRequestException.class, exception -> {
+//                                                Platform.runLater(new Runnable() {
+//                                                    public void run() {
+//                                                        Optional<ButtonType> userClickAlert = alertService.showAlert(
+//                                                                Alert.AlertType.ERROR,
+//                                                                "Book deletion error",
+//                                                                "Connection to server was lost, press OK button for return to start menu",
+//                                                                true);
+//                                                        try {
+//                                                            if ((userClickAlert.get() == ButtonType.OK)) {
+//                                                                setScene("Start menu", StartController.class, fxWeaver);
+//                                                            }
+//                                                        }catch (NoSuchElementException e){
+//                                                            setScene("Start menu", StartController.class, fxWeaver);
+//                                                        }
+//                                                    }
+//                                                });
+//                                                return Mono.empty();
+//                                            })
+//                                            .block();
                                 }
                             });
                     return row;
                 });
 
         backButton.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
                     setScene(backButton, "Main menu", MainMenuController.class, fxWeaver);
                 });
 
         deletingButton.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
                     DeleteDTO deleteDTO = DeleteDTO
                             .builder()
                             .id(libTable.getSelectionModel().getSelectedItem().getId())
@@ -189,55 +198,72 @@ public class LibraryController extends BaseController {
                             .build();
 
                     webClient.post()
-                            .uri(bookDelete)
+                            .uri(DELETE_BOOK)
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(deleteDTO)
                             .retrieve()
                             .bodyToMono(String.class)
                             .doOnSuccess(response -> libTable.getItems().removeAll(libTable.getSelectionModel().getSelectedItem()))
-                            .onErrorResume(WebClientRequestException.class, exception -> {
+                            .onErrorResume(WebClientRequestException.class, exception ->
+                            {
                                 Platform.runLater(new Runnable() {
-                                    public void run() {
+                                    public void run()
+                                    {
                                         Optional<ButtonType> userClickAlert = alertService.showAlert(
                                                 Alert.AlertType.ERROR,
                                                 "Book deletion error",
                                                 "Connection to server was lost, press OK button for return to start menu",
                                                 true);
-                                        try {
-                                            if ((userClickAlert.get() == ButtonType.OK)) {
+                                        try
+                                        {
+                                            if ((userClickAlert.get() == ButtonType.OK))
+                                            {
                                                 setScene(deletingButton, "Start menu", StartController.class, fxWeaver);
                                             }
-                                        }catch (NoSuchElementException e){
+                                        }
+                                        catch (NoSuchElementException e)
+                                        {
                                             setScene(deletingButton, "Start menu", StartController.class, fxWeaver);
                                         }
                                     }
                                 });
                                 return Mono.empty();
                             })
-                            .onErrorResume(WebClientResponseException.class, exception -> {
-                                if (exception.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                            .onErrorResume(WebClientResponseException.class, exception ->
+                            {
+                                if (exception.getStatusCode() == HttpStatus.BAD_REQUEST)
+                                {
                                     log.error("Uncorrected input data: [{}], reason [{}]",
                                             exception.getResponseBodyAsString().replaceAll("\n", " "),
                                             exception.getMessage());
-                                    Platform.runLater(new Runnable() {
-                                        public void run() {
+                                    Platform.runLater(new Runnable()
+                                    {
+                                        public void run()
+                                        {
                                             alertService.showAlert(Alert.AlertType.ERROR,
                                                     "Book deletion error",
                                                     "An unexpected error has occurred, the administrator has been notified and will try to fix it as soon as possible",
                                                     false);
                                             log.error("The book can't be deleted because [{}]", exception.getResponseBodyAsString().replaceAll("\n", " "));
-                                            try {
+                                            try
+                                            {
                                                 mailService.sendEmail(emailConfig, exception.getResponseBodyAsString(), deleteDTO.getId());
-                                            } catch (MessagingException e) {
+                                            }
+                                            catch (MessagingException e)
+                                            {
                                                 log.error("An error occurred while trying to send a notification to the administrator [{}]", e);
                                             }
                                         }
                                     });
                                     return Mono.empty();
-                                }else if (exception.getStatusCode() == HttpStatus.UNPROCESSABLE_ENTITY){
+                                }
+                                else if (exception.getStatusCode() == HttpStatus.UNPROCESSABLE_ENTITY)
+                                {
                                     log.info("Error deletion book, reason [{}]",  exception.getResponseBodyAsString().replaceAll("\n", " "));
-                                    Platform.runLater(new Runnable() {
-                                        public void run() {
+                                    Platform.runLater(new Runnable()
+                                    {
+                                        public void run()
+                                        {
                                             alertService.showAlert(Alert.AlertType.ERROR,
                                                     "Book owner's error",
                                                     exception.getResponseBodyAsString(),

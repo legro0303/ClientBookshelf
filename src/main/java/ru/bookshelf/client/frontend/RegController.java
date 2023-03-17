@@ -32,7 +32,8 @@ import java.util.Optional;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @FxmlView("/FXML/registration.fxml")
-public class RegController extends BaseController {
+public class RegController extends BaseController
+{
     @Autowired
     private FxWeaver fxWeaver;
     @Autowired
@@ -64,7 +65,9 @@ public class RegController extends BaseController {
 
     public RegController(@Value("${libraryserv.user.registration}") String userReg,
                          @Value("${libraryserv.user.validation}") String userValid,
-                         MailService mailService, AlertService alertService, AppConfiguration appConfiguration) {
+                         MailService mailService, AlertService alertService,
+                         AppConfiguration appConfiguration)
+    {
         this.userReg = userReg;
         this.userValid = userValid;
         this.mailService = mailService;
@@ -80,12 +83,14 @@ public class RegController extends BaseController {
     @FXML
     void initialize() {
         backButton.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
                     setScene(backButton, "Authorization", AuthController.class, fxWeaver);
                 });
 
         registerUserButton.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
 //                    if (firstNameTf.getText().trim().isEmpty()
 //                            || secondNameTf.getText().trim().isEmpty()
 //                            || loginTf.getText().trim().isEmpty()
@@ -98,27 +103,35 @@ public class RegController extends BaseController {
                             .login(loginTf.getText())
                             .password(passwordPf.getText())
                             .build();
-                    try {
+                    try
+                    {
                         ResponseEntity<String> notRegisteredYet = webClient.post()
                                 .uri(userValid)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(userAuthDTO)
                                 .retrieve()
                                 .toEntity(String.class)
-                                .onErrorResume(WebClientRequestException.class, exception -> {
+                                .onErrorResume(WebClientRequestException.class, exception ->
+                                {
                                     log.error("Connection to server was lost when user tried to register with login [{}]", userAuthDTO.getLogin());
-                                    Platform.runLater(new Runnable() {
-                                        public void run() {
+                                    Platform.runLater(new Runnable()
+                                    {
+                                        public void run()
+                                        {
                                             Optional<ButtonType> userClickAlert = alertService.showAlert(
                                                     Alert.AlertType.ERROR,
                                                     "Error connection",
                                                     "Connection to server was lost, press OK button for return to start menu",
                                                     true);
-                                            try {
-                                                if ((userClickAlert.get() == ButtonType.OK)) {
+                                            try
+                                            {
+                                                if ((userClickAlert.get() == ButtonType.OK))
+                                                {
                                                     setScene(registerUserButton, "Start menu", StartController.class, fxWeaver);
                                                 }
-                                            } catch (NoSuchElementException e) {
+                                            }
+                                            catch (NoSuchElementException e)
+                                            {
                                                 setScene(registerUserButton, "Start menu", StartController.class, fxWeaver);
                                             }
                                         }
@@ -127,7 +140,8 @@ public class RegController extends BaseController {
                                 })
                                 .block();
 //TODO Возникает NullPointerException когда отсутствует подключение к серверу
-                        if (notRegisteredYet.getStatusCode() == HttpStatus.OK) {
+                        if (notRegisteredYet.getStatusCode() == HttpStatus.OK)
+                        {
                             UserRegDTO userRegDTO = UserRegDTO
                                     .builder()
                                     .firstName(firstNameTf.getText())
@@ -143,46 +157,62 @@ public class RegController extends BaseController {
                                     .bodyValue(userRegDTO)
                                     .retrieve()
                                     .bodyToMono(Void.class)
-                                    .doOnSuccess(response -> {
-                                        Platform.runLater(new Runnable() {
-                                            public void run() {
+                                    .doOnSuccess(response ->
+                                    {
+                                        Platform.runLater(new Runnable()
+                                        {
+                                            public void run()
+                                            {
                                                 Optional<ButtonType> userClickAlert = alertService.showAlert(Alert.AlertType.INFORMATION,
                                                         "Successful registration",
                                                         "Success! Are you registered now",
                                                         true);
-                                                if (userClickAlert.get() == ButtonType.OK) {
+                                                if (userClickAlert.get() == ButtonType.OK)
+                                                {
                                                     setScene(backButton, "Authorization", AuthController.class, fxWeaver);
                                                 }
                                             }
                                         });
                                     })
-                                    .onErrorResume(WebClientRequestException.class, exception -> {
+                                    .onErrorResume(WebClientRequestException.class, exception ->
+                                    {
                                         log.error("Connection to server was lost when user tried to register with login [{}]", userAuthDTO.getLogin());
-                                        Platform.runLater(new Runnable() {
-                                            public void run() {
+                                        Platform.runLater(new Runnable()
+                                        {
+                                            public void run()
+                                            {
                                                 Optional<ButtonType> userClickAlert = alertService.showAlert(
                                                         Alert.AlertType.ERROR,
                                                         "Error connection",
                                                         "Connection to server was lost, press OK button for return to start menu",
                                                         true);
-                                                try {
-                                                    if ((userClickAlert.get() == ButtonType.OK)) {
+                                                try
+                                                {
+                                                    if ((userClickAlert.get() == ButtonType.OK))
+                                                    {
                                                         setScene("Start menu", StartController.class, fxWeaver);
                                                     }
-                                                } catch (NoSuchElementException e) {
+                                                }
+                                                catch (NoSuchElementException e)
+                                                {
                                                     setScene("Start menu", StartController.class, fxWeaver);
                                                 }
                                             }
                                         });
                                         return Mono.empty();
                                     })
-                                    .onErrorResume(WebClientResponseException.class, exception -> {
-                                        if (exception.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                                    .onErrorResume(WebClientResponseException.class, exception ->
+                                    {
+                                        if (exception.getStatusCode() == HttpStatus.BAD_REQUEST)
+                                        {
                                             log.error("Uncorrected input data: [{}], reason [{}]",
                                                     exception.getResponseBodyAsString().replaceAll("\n", " "),
                                                     exception.getMessage());
-                                            Platform.runLater(new Runnable() {
-                                                public void run() {
+
+                                            Platform.runLater(new Runnable()
+                                            {
+                                                public void run()
+                                                {
                                                     alertService.showAlert(Alert.AlertType.ERROR,
                                                             "Uncorrected input data",
                                                             exception.getResponseBodyAsString(),
@@ -195,17 +225,21 @@ public class RegController extends BaseController {
                                     })
                                     .block();
                         }
-                    } catch (WebClientResponseException webClientResponseException) {
+                    }
+                    catch (WebClientResponseException webClientResponseException)
+                    {
                         if ((webClientResponseException.getStatusCode() == HttpStatus.BAD_REQUEST) ||
                                 (webClientResponseException.getStatusCode() == HttpStatus.UNPROCESSABLE_ENTITY)
                         )
                             log.error("Uncorrected input data: [{}], reason [{}]",
                                     webClientResponseException.getResponseBodyAsString().replaceAll("\n", " "),
                                     webClientResponseException.getMessage());
+
                         alertService.showAlert(Alert.AlertType.ERROR,
                                 "Uncorrected input data",
                                 webClientResponseException.getResponseBodyAsString(),
                                 false);
+
                         clearFields(firstNameTf, secondNameTf, loginTf, passwordPf, mailTf);
                     }
                 });

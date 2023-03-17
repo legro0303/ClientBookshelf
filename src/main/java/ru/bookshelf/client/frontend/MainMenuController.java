@@ -31,17 +31,20 @@ public class MainMenuController extends BaseController {
     @FXML
     void initialize() {
         loadingBookLink.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
                     setScene(loadingBookLink, "Upload books", LoadBookController.class, fxWeaver);
                 });
 
         libraryLink.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
                     setScene(libraryLink, "Library", LibraryController.class, fxWeaver);
                 });
 
         backLink.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
                     userAuthRepository.deleteUser();
                     setScene(backLink, "Authorization", AuthController.class, fxWeaver);
                 });

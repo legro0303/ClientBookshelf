@@ -15,60 +15,77 @@ public abstract class BaseController {
 
     public void setScene(Button button, String title, Class controller, FxWeaver fxWeaver) {
         log.info("Upload scene [{}]", controller.getSimpleName());
-        try {
+
+        try
+        {
             button.getScene().getWindow().hide();
             Parent root = (Parent) fxWeaver.loadView(controller);
             stage.setScene(new Scene(root));
             stage.setTitle(title);
             stage.setResizable(false);
             stage.show();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             log.error("Unexpected error while uploading scene " + e);
         }
     }
 
     public void setScene(Hyperlink link, String title, Class controller, FxWeaver fxWeaver) {
         log.info("Upload scene [{}]", controller.getSimpleName());
-        try {
+
+        try
+        {
             link.getScene().getWindow().hide();
             Parent root = (Parent) fxWeaver.loadView(controller);
             stage.setTitle(title);
             stage.setResizable(false);
             stage.setScene(new Scene(root));
             stage.show();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             log.error("Unexpected error while uploading scene " + e);
         }
     }
 
     public void setScene(String title, Class controller, FxWeaver fxWeaver) {
         log.info("Upload scene [{}]", controller.getSimpleName());
-        try {
+
+        try
+        {
             Parent root = (Parent) fxWeaver.loadView(controller);
             stage.setTitle(title);
             stage.setResizable(false);
             stage.setScene(new Scene(root));
             stage.show();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             log.error("Unexpected error while uploading scene " + e);
         }
     }
 
     public void setScene(String title, PDFDisplayer displayer) {
         log.info("Upload scene [{}]", title);
-        try {
+
+        try
+        {
             Stage stage = new Stage();
             Parent root = displayer.toNode();
             stage.setTitle(title);
             stage.setResizable(false);
             stage.setScene(new Scene(root));
             stage.show();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             log.error("Unexpected error while uploading scene " + e);
         }
     }
 
-    public void clearFields(TextField firstNameReg, TextField secondNameReg, TextField loginReg, PasswordField passReg, TextField mailReg) {
+    public void clearFields(TextField firstNameReg, TextField secondNameReg,
+                            TextField loginReg, PasswordField passReg, TextField mailReg) {
         firstNameReg.clear();
         secondNameReg.clear();
         loginReg.clear();

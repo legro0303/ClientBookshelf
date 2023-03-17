@@ -18,15 +18,16 @@ public class ClientApplication extends Application {
     private ConfigurableApplicationContext context;
 
     @Override
-    public void init() throws Exception {
+    public void init() {
         String[] args = getParameters().getRaw().toArray(new String[0]);
+
         this.context = new SpringApplicationBuilder()
                 .sources(StartJavaFX.class)
                 .run(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         FxWeaver fxWeaver = context.getBean(FxWeaver.class);
         Parent root = fxWeaver.loadView(StartController.class);
         Scene scene = new Scene(root, 1280, 720);
@@ -36,7 +37,7 @@ public class ClientApplication extends Application {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         this.context.close();
         Platform.exit();
     }

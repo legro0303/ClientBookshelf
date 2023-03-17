@@ -58,27 +58,36 @@ public class StartController extends BaseController {
     @FXML
     void initialize() {
         startButton.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
                         webClient.post()
                                 .uri(healthCheckURL)
                                 .retrieve()
                                 .bodyToMono(Void.class)
                                 .doOnSuccess(response -> {
                                     log.info("Server is available!");
-                                    Platform.runLater(new Runnable() {
-                                        public void run() {
+                                    Platform.runLater(new Runnable()
+                                    {
+                                        public void run()
+                                        {
                                             setScene(startButton, "Authorization", AuthController.class, fxWeaver);
                                         }
                                     });
                                 })
-                                .onErrorResume(WebClientRequestException.class, throwable -> {
-                                    try {
+                                .onErrorResume(WebClientRequestException.class, throwable ->
+                                {
+                                    try
+                                    {
                                         mailService.sendEmail(emailConfig, throwable);
-                                    } catch (MessagingException messagingException) {
+                                    }
+                                    catch (MessagingException messagingException)
+                                    {
                                         log.error("An error occurred while trying to send a notification to the administrator [{}]", messagingException);
                                     }
-                                    Platform.runLater(new Runnable() {
-                                        public void run() {
+                                    Platform.runLater(new Runnable()
+                                    {
+                                        public void run()
+                                        {
                                             alertService.showAlert(Alert.AlertType.ERROR,
                                                     "Server unavailable",
                                                     "An unexpected error has occurred, the administrator has been notified and will try to fix it as soon as possible",

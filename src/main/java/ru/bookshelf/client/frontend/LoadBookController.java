@@ -32,7 +32,8 @@ import java.util.Optional;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @FxmlView("/FXML/loadingBook.fxml")
-public class LoadBookController extends BaseController {
+public class LoadBookController extends BaseController
+{
     @Autowired
     private Stage stage;
     @Autowired
@@ -53,28 +54,33 @@ public class LoadBookController extends BaseController {
     @FXML
     private DatePicker publishDateDp;
 
-    private final String bookAdd;
+    private final String addBook;
     private final AlertService alertService;
     private final UserAuthRepository userAuthRepository;
 
     private File choosedFile;
     private InputStream file;
 
-    public LoadBookController(@Value("${libraryserv.book.add}") String bookAdd, AlertService alertService, UserAuthRepository userAuthRepository) {
-        this.bookAdd = bookAdd;
+    public LoadBookController(@Value("${libraryserv.book.add}") String addBook, AlertService alertService,
+                              UserAuthRepository userAuthRepository)
+    {
+        this.addBook = addBook;
         this.alertService = alertService;
         this.userAuthRepository = userAuthRepository;
     }
 
     @FXML
-    void initialize() {
+    void initialize()
+    {
         backButton.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
                     setScene(backButton, "Library", MainMenuController.class, fxWeaver);
                 });
 
         loadingBookButton.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
                     FileChooser fileChooser = new FileChooser();
                     FileChooser.ExtensionFilter extFilter =
                             new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
@@ -84,23 +90,28 @@ public class LoadBookController extends BaseController {
                 });
 
         savingBookButton.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
 //                    if (authorTf.getText().trim().isEmpty()
 //                            || titleTf.getText().trim().isEmpty()
 //                            || publishDateDp.getValue() == null) {
 //                        alertService.showAlert(Alert.AlertType.ERROR, "Пустые поля при загрузке книги", "Вы заполнили не все поля", false);
 //                    } else {
 
-                    try {
+                    try
+                    {
                         file = new FileInputStream(new File(choosedFile.getAbsolutePath()));
-                    } catch (FileNotFoundException | NullPointerException e) {
+                    }
+                    catch (FileNotFoundException | NullPointerException e)
+                    {
                         alertService.showAlert(Alert.AlertType.ERROR,
                                 "The book isn't loaded",
                                 "Please upload the book before saving it first",
                                 false);
                         log.error("Uploading file not found or not selected by user [{}]", e.getMessage());
                     }
-                    try {
+                    try
+                    {
                         byte[] bookBytes = file.readAllBytes();
                         if (bookBytes.length >= 262144) {
                             alertService.showAlert(Alert.AlertType.ERROR,
@@ -108,8 +119,11 @@ public class LoadBookController extends BaseController {
                                     "The uploaded file exceeds the specified limit (262 KB)",
                                     false);
                             file.close();
-                        }else{
-                            try{
+                        }
+                        else
+                        {
+                            try
+                            {
                             BookDTO bookDTO = BookDTO
                                     .builder()
                                     .author(authorTf.getText())
@@ -119,57 +133,75 @@ public class LoadBookController extends BaseController {
                                     .fileData(bookBytes)
                                     .build();
                             webClient.post()
-                                    .uri(bookAdd)
+                                    .uri(addBook)
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .bodyValue(bookDTO)
                                     .retrieve()
                                     .bodyToMono(String.class)
-                                    .doOnSuccess(response -> {
+                                    .doOnSuccess(response ->
+                                    {
                                         log.info("Book with title [{}] was saved successfully!", bookDTO.getTitle());
-                                        Platform.runLater(new Runnable() {
-                                            public void run() {
+                                        Platform.runLater(new Runnable()
+                                        {
+                                            public void run()
+                                            {
                                                 Optional<ButtonType> userClickAlert = alertService.showAlert(
                                                         Alert.AlertType.INFORMATION,
                                                         "Success",
                                                         "The book has been successfully uploaded!",
                                                         true);
-                                                try {
-                                                    if ((userClickAlert.get() == ButtonType.OK)) {
+                                                try
+                                                {
+                                                    if ((userClickAlert.get() == ButtonType.OK))
+                                                    {
                                                         clearFields(authorTf, titleTf, publishDateDp);
                                                     }
-                                                } catch (NoSuchElementException e) {
+                                                }
+                                                catch (NoSuchElementException e)
+                                                {
                                                     clearFields(authorTf, titleTf, publishDateDp);
                                                 }
                                             }
                                         });
                                     })
-                                    .onErrorResume(WebClientRequestException.class, exception -> {
+                                    .onErrorResume(WebClientRequestException.class, exception ->
+                                    {
                                         log.error("Connection to server was lost when user tried to load book with title [{}]", bookDTO.getTitle());
-                                        Platform.runLater(new Runnable() {
-                                            public void run() {
+                                        Platform.runLater(new Runnable()
+                                        {
+                                            public void run()
+                                            {
                                                 Optional<ButtonType> userClickAlert = alertService.showAlert(
                                                         Alert.AlertType.ERROR,
                                                         "Error connection",
                                                         "Connection to server was lost, press OK button for return to start menu",
                                                         true);
-                                                try {
-                                                    if ((userClickAlert.get() == ButtonType.OK)) {
+                                                try
+                                                {
+                                                    if ((userClickAlert.get() == ButtonType.OK))
+                                                    {
                                                         setScene(savingBookButton, "Start menu", StartController.class, fxWeaver);
                                                     }
-                                                }catch (NoSuchElementException e){
+                                                }
+                                                catch (NoSuchElementException e)
+                                                {
                                                     setScene(savingBookButton, "Start menu", StartController.class, fxWeaver);
                                                 }
                                             }
                                         });
                                         return Mono.empty();
                                     })
-                                    .onErrorResume(WebClientResponseException.class, exception -> {
-                                        if (exception.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                                    .onErrorResume(WebClientResponseException.class, exception ->
+                                    {
+                                        if (exception.getStatusCode() == HttpStatus.BAD_REQUEST)
+                                        {
                                             log.error("Uncorrected input data: [{}], reason [{}]",
                                                     exception.getResponseBodyAsString().replaceAll("\n", " "),
                                                     exception.getMessage());
-                                            Platform.runLater(new Runnable() {
-                                                public void run() {
+                                            Platform.runLater(new Runnable()
+                                            {
+                                                public void run()
+                                                {
                                                     alertService.showAlert(Alert.AlertType.ERROR,
                                                             "Uncorrected input data",
                                                             exception.getResponseBodyAsString(),
@@ -181,11 +213,15 @@ public class LoadBookController extends BaseController {
                                         return Mono.error(exception);
                                     })
                                     .block();
-                        } catch (NullPointerException nullPointerException) {
+                        }
+                            catch (NullPointerException nullPointerException)
+                            {
                             log.error("DatePicker is null [{}]", nullPointerException);
+                            }
                         }
-                        }
-                    }catch (IOException ioException){
+                    }
+                    catch (IOException ioException)
+                    {
                         log.error("Error reading bytes from file  [{}]", ioException);
                     }
                 });

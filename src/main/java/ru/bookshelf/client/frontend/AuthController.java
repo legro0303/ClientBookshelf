@@ -46,7 +46,7 @@ public class AuthController extends BaseController {
     @FXML
     private Hyperlink registrationLink;
 
-    private final String authUser;
+    private final String USER_AUTH;
     private final MailService mailService;
     private final AlertService alertService;
     private final UserAuthRepository userAuthRepository;
@@ -55,9 +55,12 @@ public class AuthController extends BaseController {
 
     private AppConfiguration.EmailConfig emailConfig;
 
-    public AuthController(@Value("${libraryserv.user.authorization}") String authUser,
-                          MailService mailService, AlertService alertService, UserAuthRepository userAuthRepository, AppConfiguration appConfiguration) {
-        this.authUser = authUser;
+    public AuthController(@Value("${libraryserv.user.authorization}") String userAuth,
+                          MailService mailService,
+                          AlertService alertService,
+                          UserAuthRepository userAuthRepository,
+                          AppConfiguration appConfiguration) {
+        this.USER_AUTH = userAuth;
         this.mailService = mailService;
         this.alertService = alertService;
         this.userAuthRepository = userAuthRepository;
@@ -72,83 +75,104 @@ public class AuthController extends BaseController {
     @FXML
     void initialize() {
         registrationLink.setOnAction(
-                actionEvent -> {
+                actionEvent ->
+                {
                     setScene(registrationLink, "Registration", RegController.class, fxWeaver);
                 });
 
         authButton.setOnAction(
-                actionEvent -> {
-                    if (loginTf.getText().trim().isEmpty()
-                            || passwordPf.getText().trim().isEmpty()) {
+                actionEvent ->
+                {
+                    if (loginTf.getText().trim().isEmpty() || passwordPf.getText().trim().isEmpty())
+                    {
                         alertService.showAlert(Alert.AlertType.ERROR,
                                 "Empty fields error",
                                 "Login or password which was entered are empty",
                                 false);
+
                         clearFields(loginTf, passwordPf);
-                    } else {
+                    }
+                    else
+                    {
                         UserAuthDTO userAuthDTO = UserAuthDTO
                                 .builder()
                                 .login(loginTf.getText())
                                 .password(passwordPf.getText())
                                 .build();
+
                         userAuthRepository.addUser(userAuthDTO);
 
                         webClient.post()
-                                .uri(authUser)
+                                .uri(USER_AUTH)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(userAuthDTO)
                                 .retrieve()
                                 .bodyToMono(String.class)
-                                .doOnSuccess(response -> {
+                                .doOnSuccess(response ->
+                                {
                                     log.info("User [{}] was authorized successfully!", userAuthDTO.getLogin());
-                                    Platform.runLater(new Runnable() {
-                                        public void run() {
+                                    Platform.runLater(new Runnable()
+                                    {
+                                        public void run()
+                                        {
                                             setScene(authButton, "Main menu", MainMenuController.class, fxWeaver);
                                         }
                                     });
                                 })
-                                .onErrorResume(WebClientRequestException.class, exception -> {
+                                .onErrorResume(WebClientRequestException.class, exception ->
+                                {
                                     log.error("Connection to server was lost when user [{}] tried to authorize", userAuthDTO.getLogin());
-                                    Platform.runLater(new Runnable() {
-                                        public void run() {
+                                    Platform.runLater(new Runnable()
+                                    {
+                                        public void run()
+                                        {
                                             Optional<ButtonType> userClickAlert = alertService.showAlert(
                                                     Alert.AlertType.ERROR,
                                                     "Error connection",
                                                     "Connection to server was lost, press OK button for return to start menu",
                                                     true);
-                                            try {
-                                                if ((userClickAlert.get() == ButtonType.OK)) {
+                                            try
+                                            {
+                                                if ((userClickAlert.get() == ButtonType.OK))
+                                                {
                                                     setScene(authButton, "Start menu", StartController.class, fxWeaver);
                                                 }
-                                            }catch (NoSuchElementException e){
+                                            }
+                                            catch (NoSuchElementException e)
+                                            {
                                                 setScene(authButton, "Start menu", StartController.class, fxWeaver);
                                             }
                                         }
                                     });
                                     return Mono.empty();
                                 })
-                                .onErrorResume(WebClientResponseException.class, exception -> {
-                                    if (exception.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                                .onErrorResume(WebClientResponseException.class, exception ->
+                                {
+                                    if (exception.getStatusCode() == HttpStatus.BAD_REQUEST)
+                                    {
                                         log.error("Uncorrected input data: [{}], reason [{}]",
                                                 exception.getResponseBodyAsString().replaceAll("\n", " "),
                                                 exception.getMessage());
-                                        Platform.runLater(new Runnable() {
-                                            public void run() {
-                                                alertService.showAlert(Alert.AlertType.ERROR,
-                                                        "Uncorrected input data",
-                                                        exception.getResponseBodyAsString(),
-                                                        false);
+                                        Platform.runLater(new Runnable()
+                                        {
+                                            public void run()
+                                            {
+                                                alertService.showAlert(Alert.AlertType.ERROR, "Uncorrected input data",
+                                                        exception.getResponseBodyAsString(), false);
                                             }
                                         });
                                         return Mono.empty();
-                                    } else if (exception.getStatusCode() == HttpStatus.UNPROCESSABLE_ENTITY) {
+                                    }
+                                    else if (exception.getStatusCode() == HttpStatus.UNPROCESSABLE_ENTITY)
+                                    {
                                         log.error("The user with the specified combination of password and login was not found [{}]", exception.getMessage());
-                                        Platform.runLater(new Runnable() {
-                                            public void run() {
-                                                alertService.showAlert(Alert.AlertType.ERROR,
-                                                        "Authorization error",
-                                                        exception.getResponseBodyAsString(),
-                                                        false);
+                                        Platform.runLater(new Runnable()
+                                        {
+                                            public void run()
+                                            {
+                                                alertService.showAlert(Alert.AlertType.ERROR,"Authorization error",
+                                                        exception.getResponseBodyAsString(),false);
+
                                                 clearFields(loginTf, passwordPf);
                                             }
                                         });

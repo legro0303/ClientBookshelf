@@ -36,6 +36,7 @@ public class MailService {
         helper.setSubject(email.getSubjectServerUnavailable());
         helper.setText(process, true);
         javaMailSender.send(mimeMessage);
+
         log.info("Email was sent successfully");
     }
     @Async

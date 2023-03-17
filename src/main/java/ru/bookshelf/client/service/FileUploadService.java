@@ -22,25 +22,37 @@ public class FileUploadService {
         this.alertService = alertService;
     }
 
-    public File convertToFile(byte[] book) throws IOException {
+    public File convertToFile(byte[] book) throws IOException
+    {
         File folder = new File(uploadDir);
-        if (!folder.exists()) {
-            try {
+
+        if (!folder.exists())
+        {
+            try
+            {
                 folder.mkdirs();
-            } catch (SecurityException e) {
+            }
+            catch (SecurityException e)
+            {
                 log.error("Can't create output catalog because has not permission");
+
                 alertService.showAlert(Alert.AlertType.ERROR,
                         "No access",
                         "The application is not running as an administrator, there are no rights to create a book file",
                         false);
             }
         }
+
         Path filepath = Paths.get(uploadDir + File.separator + "out.pdf");
-        if (Files.exists(filepath)) {
+
+        if (Files.exists(filepath))
+        {
             Files.delete(filepath);
         }
+
         Files.write(Files.createFile(filepath), book);
         File file = new File(String.valueOf(filepath));
+
         return file;
     }
 }
